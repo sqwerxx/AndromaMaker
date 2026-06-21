@@ -1,789 +1,1472 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Androma Maker</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    
-    <!-- PrismJS для подсветки синтаксиса Python -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Architect — Telegram Mini App Builder</title>
+  
+  <!-- Google Fonts: Inter & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        if (typeof tailwind !== 'undefined') {
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                        panel: '#FFFFFF',       /* Чистый белый для карточек */
-                        espresso: '#1A110B',    /* Темный текст */
-                        coffee: '#8C7A6B',      /* Второстепенный текст */
-                        accent: '#3390EC',      /* Telegram Blue - Основной акцент */
-                        'accent-hover': '#2A7BCB',
-                        'accent-light': '#E3F2FD', /* Светло-голубой для фонов */
-                        danger: '#E53935',      /* Красный для удаления */
-                    },
-                    fontFamily: {
-                        heading: ['"Playfair Display"', 'serif'],
-                        body: ['"Lora"', 'serif'],
-                        mono: ['"Fira Code"', 'monospace'],
-                    },
-                    boxShadow: {
-                        'elegant': '0 10px 40px -10px rgba(51, 144, 236, 0.1)',
-                        'floating': '0 20px 50px -15px rgba(51, 144, 236, 0.15)',
-                    },
-                    spacing: {
-                        'safe-bottom': 'env(safe-area-inset-bottom)',
-                        'safe-top': 'env(safe-area-inset-top)',
-                    }
-                }
-            }
-        };
-        } else {
-            console.warn("Tailwind CSS не загрузился из-за блокировки CDN. Включите VPN или используйте локальную сборку.");
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            milk: '#FBF9F6',
+            graphite: '#2C2C2C',
+            beige: '#F5F0E6',
+            softbrown: '#C5A880',
+            activebrown: '#D9C3B0',
+            borderbeige: '#E8E2D5',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          }
         }
-    </script>
+      }
+    }
+  </script>
 
-    <style>
-        /* Базовые сбросы */
-        * {
-            -webkit-tap-highlight-color: transparent;
-            box-sizing: border-box;
-        }
+  <style>
+    /* Блокируем скролл всего экрана для фиксации панелей */
+    html, body {
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      background-color: #FBF9F6;
+      color: #2C2C2C;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-user-select: none;
+      user-select: none;
+    }
 
-        body {
-            background-color: #FDFBF7;
-            color: #1A110B;
-            overscroll-behavior-y: none;
-        }
+    /* Элегантный кастомный скроллбар */
+    .scroll-container::-webkit-scrollbar {
+      width: 4px;
+    }
+    .scroll-container::-webkit-scrollbar-track {
+      background: #F5F0E6;
+    }
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: #C5A880;
+      border-radius: 2px;
+    }
 
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* Премиальные тени и глубина */
+    .shadow-premium {
+      box-shadow: 0 16px 40px -10px rgba(197, 168, 128, 0.22), 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+    .shadow-inner-soft {
+      box-shadow: inset 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+    }
 
-        /* --- Анимации --- */
-        @keyframes fadeInScale {
-            0% { opacity: 0; transform: scale(0.97) translateY(10px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
+    /* Возможность мгновенного отключения переходов */
+    .no-transitions * {
+      transition: none !important;
+      animation: none !important;
+    }
 
-        @keyframes slideInRight {
-            0% { opacity: 0; transform: translateX(30px); }
-            100% { opacity: 1; transform: translateX(0); }
-        }
+    /* ================= СИСТЕМА МОМЕНТАЛЬНЫХ ПРЕМИУМ-АНИМАЦИЙ ================= */
+    @keyframes fadeOutInstant {
+      0% {
+        opacity: 0;
+        transform: translateY(4px) scale(0.99);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
 
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 0 0 rgba(51, 144, 236, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(51, 144, 236, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(51, 144, 236, 0); }
-        }
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
 
-        .view-section {
-            display: none;
-            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        
-        .view-section.active {
-            display: flex;
-        }
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-8px);
+      }
+      to {
+        opacity: 1;
+        max-height: 600px;
+        transform: translateY(0);
+      }
+    }
 
-        /* Staggering для карточек ботов */
-        .bot-card {
-            opacity: 0;
-            animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .bot-card:nth-child(1) { animation-delay: 0.05s; }
-        .bot-card:nth-child(2) { animation-delay: 0.1s; }
-        .bot-card:nth-child(3) { animation-delay: 0.15s; }
-        .bot-card:nth-child(4) { animation-delay: 0.2s; }
+    /* Классы для анимации */
+    .animate-tab {
+      animation: fadeOutInstant 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
 
-        /* Эффект волны (Ripple) для кнопок */
-        .ripple {
-            position: relative;
-            overflow: hidden;
-        }
-        .ripple-element {
-            position: absolute;
-            border-radius: 50%;
-            transform: scale(0);
-            animation: ripple-animation 0.6s linear;
-            background-color: rgba(255, 255, 255, 0.4);
-        }
-        @keyframes ripple-animation {
-            to { transform: scale(4); opacity: 0; }
-        }
+    .animate-pop {
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
 
-        /* --- Инпуты --- */
-        .premium-input {
-            width: 100%;
-            background: rgba(51, 144, 236, 0.05);
-            border: 1px solid rgba(51, 144, 236, 0.1);
-            color: #1A110B;
-            padding: 1rem 1.25rem;
-            border-radius: 16px;
-            font-family: "Lora", serif;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-        }
-        .premium-input:focus {
-            outline: none;
-            border-color: #3390EC;
-            background: #FFFFFF;
-            box-shadow: 0 4px 20px rgba(51, 144, 236, 0.1);
-        }
-        .premium-input::placeholder {
-            color: #8C7A6B;
-            opacity: 0.7;
-        }
-
-        /* --- Редактор Кода (Textarea + Pre) --- */
-        .editor-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background-color: #1d1f21; /* Под цвет prism-tomorrow */
-            border-radius: 20px;
-            overflow: hidden;
-        }
-        
-        .code-textarea, .code-output {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 1.5rem;
-            font-family: "Fira Code", monospace;
-            font-size: 14px;
-            line-height: 1.5;
-            white-space: pre;
-            overflow-wrap: normal;
-            overflow-x: auto;
-            overflow-y: auto;
-            tab-size: 4;
-        }
-
-        .code-textarea {
-            color: transparent; /* Текст прозрачный, видим только каретку */
-            background: transparent;
-            caret-color: #3390EC; /* Синяя каретка */
-            z-index: 2;
-            resize: none;
-            border: none;
-            outline: none;
-        }
-
-        .code-output {
-            z-index: 1;
-            pointer-events: none; /* Клики проходят сквозь pre к textarea */
-            margin: 0;
-        }
-
-        /* Скроллбары для редактора */
-        .code-textarea::-webkit-scrollbar { width: 8px; height: 8px; }
-        .code-textarea::-webkit-scrollbar-track { background: transparent; }
-        .code-textarea::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-
-        /* --- Навигация --- */
-        .nav-btn {
-            color: #8C7A6B;
-            transition: all 0.3s ease;
-        }
-        .nav-btn.active {
-            color: #3390EC;
-            transform: translateY(-2px);
-        }
-        .nav-btn.active svg {
-            filter: drop-shadow(0 4px 6px rgba(51, 144, 236, 0.3));
-        }
-
-        /* Аватар профиля */
-        .avatar-upload-wrapper {
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        .avatar-upload-wrapper:active {
-            transform: scale(0.95);
-        }
-        .avatar-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .avatar-upload-wrapper:hover .avatar-overlay {
-            opacity: 1;
-        }
-        
-        /* Модалка Telegram Stars */
-        .stars-btn {
-            background: linear-gradient(135deg, #007AFF 0%, #0056B3 100%);
-            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3);
-        }
-    </style>
+    .animate-accordion {
+      animation: slideDown 0.35s cubic-bezier(0.87, 0, 0.13, 1) forwards;
+      overflow: hidden;
+    }
+  </style>
 </head>
-<body class="h-screen w-screen flex flex-col font-body antialiased relative">
+<body class="h-screen w-screen flex flex-col justify-between relative overflow-hidden">
 
-    <!-- ========================================== -->
-    <!-- ОСНОВНОЙ КОНТЕЙНЕР ПРИЛОЖЕНИЯ -->
-    <!-- ========================================== -->
-    <main class="flex-1 overflow-y-auto hide-scrollbar pt-safe-top pb-28 px-4 sm:px-6 relative z-10" id="main-container">
-        
-        <!-- ========================================== -->
-        <!-- ЭКРАН 1: МОИ БОТЫ (AIOGRAM КОД) -->
-        <!-- ========================================== -->
-        <section id="view-bots" class="view-section pt-6 min-h-full flex-col active">
-            <header class="mb-8 px-2">
-                <h1 class="font-heading text-4xl font-bold tracking-tight text-espresso mb-1">Проекты</h1>
-                <p class="text-accent font-medium text-sm">Aiogram Скрипты</p>
-            </header>
+  <!-- ================= TOP HEADER (Строго фиксирован) ================= -->
+  <header class="h-20 flex-none px-6 border-b border-borderbeige/60 bg-milk/95 backdrop-blur-md z-40 flex justify-between items-center shadow-sm">
+    <div class="animate-tab">
+      <h1 class="font-serif italic text-2xl tracking-wide text-graphite flex items-center gap-2 select-none">
+        Architect
+      </h1>
+      <p class="text-[11px] text-graphite/60 tracking-tight mt-0.5 font-medium">Конструктор телеграм-ботов на aiogram</p>
+    </div>
+  </header>
 
-            <div id="bots-list" class="space-y-4 flex-1 pb-10">
-                <!-- Карточки ботов рендерятся через JS -->
-            </div>
-            
-            <!-- Состояние пустого списка -->
-            <div id="bots-empty-state" class="hidden flex-1 flex flex-col items-center justify-center text-center py-16">
-                <div class="w-24 h-24 rounded-full bg-accent-light flex items-center justify-center mb-6 text-accent">
-                    <!-- Telegram Native Folder/Bot Icon -->
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                        <path d="M9 14h6"></path>
-                        <path d="M12 11v6"></path>
-                    </svg>
-                </div>
-                <h3 class="font-heading text-2xl mb-2 text-espresso font-semibold">Нет проектов</h3>
-                <p class="text-coffee text-base max-w-[250px]">Нажмите на кнопку ниже, чтобы создать новый aiogram скрипт.</p>
-            </div>
-        </section>
+  <!-- ================= ИЗОЛИРОВАННАЯ ЗОНА КОНТЕНТА СО СКРОЛЛОМ ================= -->
+  <main class="flex-grow overflow-y-auto scroll-container px-5 py-6 bg-milk/40 relative z-10" id="main-scroll-view">
 
-        <!-- ========================================== -->
-        <!-- ЭКРАН 2: СОЗДАТЬ БОТА -->
-        <!-- ========================================== -->
-        <section id="view-create" class="view-section pt-6 flex-col min-h-full">
-            <header class="mb-10 px-2">
-                <h1 class="font-heading text-4xl font-bold tracking-tight text-espresso mb-1">Новый бот</h1>
-                <p class="text-coffee text-sm">Инициализация проекта Aiogram</p>
-            </header>
+    <!-- 1. TAB: MY BOTS -->
+    <div id="tab-bots" class="tab-content space-y-6">
+      <div class="flex justify-between items-center px-1">
+        <h2 class="text-lg font-medium tracking-tight">Мои проекты</h2>
+        <span id="bots-count-badge" class="text-xs text-graphite/40 font-bold">0 проектов</span>
+      </div>
 
-            <div class="bg-panel rounded-[32px] p-6 shadow-elegant border border-accent/5 relative overflow-hidden">
-                <!-- Декоративный акцентный блик -->
-                <div class="absolute -top-16 -right-16 w-32 h-32 bg-accent opacity-10 rounded-full blur-2xl"></div>
-
-                <form id="create-bot-form" class="space-y-8 relative z-10">
-                    <div>
-                        <label class="block text-xs uppercase tracking-widest text-accent mb-3 font-semibold">Название проекта</label>
-                        <input type="text" id="bot-name" class="premium-input" placeholder="Например: Shop Assistant" required autocomplete="off">
-                    </div>
-
-                    <button type="submit" class="ripple w-full bg-accent text-white py-4 rounded-2xl font-medium text-lg flex items-center justify-center space-x-3 transition-transform duration-300 active:scale-[0.97] shadow-lg shadow-accent/30 mt-6">
-                        <!-- Иконка создания (Telegram style) -->
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 5v14"></path>
-                            <path d="M5 12h14"></path>
-                        </svg>
-                        <span>Создать проект</span>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <!-- ========================================== -->
-        <!-- ЭКРАН 3: АККАУНТ -->
-        <!-- ========================================== -->
-        <section id="view-account" class="view-section pt-6 flex-col min-h-full">
-            <header class="mb-8 flex items-center justify-between px-2">
-                <div>
-                    <h1 class="font-heading text-4xl font-bold tracking-tight text-espresso">Профиль</h1>
-                </div>
-            </header>
-
-            <!-- Блок профиля -->
-            <div class="flex items-center space-x-6 mb-10 px-2">
-                <!-- Загрузка аватара -->
-                <div class="relative">
-                    <label for="avatar-upload" class="avatar-upload-wrapper block w-24 h-24 rounded-full bg-accent text-white shadow-elegant border-4 border-surface overflow-hidden">
-                        <div id="avatar-preview" class="w-full h-full bg-cover bg-center flex items-center justify-center font-heading text-3xl">
-                            <span id="profile-initials">АМ</span>
-                        </div>
-                        <div class="avatar-overlay">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                        </div>
-                    </label>
-                    <input type="file" id="avatar-upload" class="hidden" accept="image/png, image/jpeg, image/webp">
-                </div>
-                
-                <div class="flex-1">
-                    <label class="text-xs uppercase tracking-widest text-accent font-semibold">Имя пользователя</label>
-                    <div class="relative mt-2">
-                        <input type="text" id="profile-name-input" class="w-full bg-transparent border-b-2 border-transparent focus:border-accent text-3xl font-heading text-espresso focus:outline-none transition-colors py-1" value="Александр">
-                        <!-- Карандаш -->
-                        <svg class="absolute right-0 top-1/2 -translate-y-1/2 w-5 h-5 text-coffee opacity-50 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Telegram Stars Payment Block -->
-            <div class="bg-panel rounded-[32px] p-6 shadow-elegant border border-accent/5 mb-8 text-center relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent pointer-events-none"></div>
-                
-                <!-- Официальная иконка Telegram Stars -->
-                <div class="w-20 h-20 mx-auto mb-4 relative z-10 flex justify-center items-center">
-                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-xl">
-                        <defs>
-                            <linearGradient id="tgStarGold" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#FFD93D"/>
-                                <stop offset="100%" stop-color="#FF9500"/>
-                            </linearGradient>
-                            <linearGradient id="tgStarBlue" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#3390EC"/>
-                                <stop offset="100%" stop-color="#0056B3"/>
-                            </linearGradient>
-                        </defs>
-                        <!-- Золотая база -->
-                        <circle cx="50" cy="50" r="48" fill="url(#tgStarGold)"/>
-                        <circle cx="50" cy="50" r="45" fill="none" stroke="#FFF" stroke-width="2" opacity="0.4"/>
-                        <!-- Внутренняя синяя звезда -->
-                        <path d="M50 15 L59 38 L82 38 L63 53 L70 78 L50 63 L30 78 L37 53 L18 38 L41 38 Z" fill="url(#tgStarBlue)"/>
-                        <!-- Блик -->
-                        <path d="M50 15 L59 38 L82 38 L63 53 L50 42 Z" fill="#66B2FF" opacity="0.5"/>
-                    </svg>
-                </div>
-                
-                <h3 class="font-heading text-2xl font-bold text-espresso mb-2 relative z-10">Androma PRO</h3>
-                <p class="text-coffee text-sm mb-6 relative z-10">Разблокируйте неограниченную генерацию Python-кода и эксклюзивные Aiogram-шаблоны.</p>
-                
-                <button id="buy-stars-btn" class="ripple stars-btn w-full text-white py-4 rounded-2xl font-semibold text-lg flex items-center justify-center space-x-2 transition-transform duration-300 active:scale-[0.97] relative z-10">
-                    <span>Купить за 100</span>
-                    <svg width="20" height="20" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="50" cy="50" r="48" fill="url(#tgStarGold)"/>
-                        <path d="M50 15 L59 38 L82 38 L63 53 L70 78 L50 63 L30 78 L37 53 L18 38 L41 38 Z" fill="url(#tgStarBlue)"/>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- Настройки -->
-            <div class="bg-panel rounded-[32px] p-2 shadow-sm border border-black/5">
-                <h4 class="text-xs uppercase tracking-widest text-accent font-semibold px-4 pt-4 pb-2">Система</h4>
-                
-                <div class="space-y-1 pb-2">
-                    <div class="flex items-center justify-between p-3 px-4 rounded-2xl hover:bg-accent/5 transition-colors cursor-pointer" onclick="showToast('Уведомления изменены')">
-                        <div class="flex items-center space-x-4">
-                            <!-- Иконка колокольчика -->
-                            <svg class="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                            <span class="text-espresso font-medium text-lg">Уведомления</span>
-                        </div>
-                        <div class="w-12 h-6 bg-accent rounded-full relative">
-                            <div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- ========================================== -->
-    <!-- ЭКРАН 4: РЕДАКТОР КОДА (FULLSCREEN) -->
-    <!-- ========================================== -->
-    <section id="view-editor" class="fixed inset-0 z-50 bg-surface flex flex-col hidden transform transition-transform duration-500 translate-y-full">
-        <!-- Header -->
-        <header class="bg-surface pt-safe-top px-4 py-4 border-b border-black/5 flex items-center justify-between shadow-sm z-10">
-            <button id="editor-back-btn" class="p-2 text-accent hover:bg-accent/10 rounded-full transition-colors active:scale-95">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><polyline points="12 19 5 12 12 5"></polyline></svg>
-            </button>
-            
-            <h2 id="editor-title" class="font-heading font-bold text-xl text-espresso truncate px-4">bot_main.py</h2>
-            
-            <button id="editor-save-btn" class="bg-accent text-white px-5 py-2 rounded-xl font-medium shadow-md active:scale-95 transition-all text-sm flex items-center space-x-2">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                <span>Сохранить</span>
-            </button>
-        </header>
-
-        <!-- Body -->
-        <div class="flex-1 p-4 pb-safe-bottom bg-[#1d1f21]">
-            <div class="editor-container shadow-elegant">
-                <textarea id="code-input" class="code-textarea" spellcheck="false"></textarea>
-                <pre id="code-display" class="code-output"><code class="language-python" id="code-content"></code></pre>
-            </div>
+      <!-- Empty State (Пустое состояние) -->
+      <div id="bots-empty-state" class="py-16 px-6 text-center border border-dashed border-borderbeige rounded-[2rem] bg-beige/20 flex flex-col items-center justify-center space-y-4 shadow-sm animate-tab">
+        <div class="w-12 h-12 rounded-full bg-beige flex items-center justify-center text-softbrown shadow-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
         </div>
-    </section>
-
-    <!-- ========================================== -->
-    <!-- НИЖНЯЯ НАВИГАЦИЯ (TABS) -->
-    <!-- ========================================== -->
-    <nav id="bottom-nav" class="fixed bottom-0 left-0 w-full z-40 pb-safe-bottom transition-transform duration-500">
-        <div class="mx-6 mb-6 rounded-2xl bg-panel/90 backdrop-blur-xl border border-black/5 shadow-floating flex items-center justify-around p-3">
-            
-            <button class="nav-btn active relative p-3 flex flex-col items-center gap-1" data-target="view-bots">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
-                <span class="text-[10px] font-bold">Проекты</span>
-            </button>
-            
-            <!-- Акцентная кнопка Плюс (без круга) -->
-            <button class="nav-btn relative p-3 flex flex-col items-center gap-1 text-accent hover:text-accent-hover transition-colors transform active:scale-90" data-target="view-create">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 4px 10px rgba(51, 144, 236, 0.4));"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            </button>
-            
-            <button class="nav-btn relative p-3 flex flex-col items-center gap-1" data-target="view-account">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <span class="text-[10px] font-bold">Профиль</span>
-            </button>
-
+        <div class="space-y-1">
+          <p class="font-serif italic text-base text-graphite/80">Чистый лист возможностей</p>
+          <p class="text-xs text-graphite/45 max-w-[260px] leading-relaxed">У вас пока нет спроектированных ботов. Создайте свой первый проект во вкладке меню ниже.</p>
         </div>
-    </nav>
+        <button onclick="switchTab('create')" class="mt-2 text-xs bg-graphite text-milk px-6 py-3 rounded-full hover:bg-graphite/90 transition-all font-semibold tracking-tight shadow-sm active:scale-95 transform duration-150">
+          Создать проект
+        </button>
+      </div>
 
-    <!-- Toast Уведомление -->
-    <div id="toast" class="fixed top-safe-top left-1/2 -translate-x-1/2 mt-4 px-6 py-3 bg-accent text-white rounded-full shadow-floating text-sm font-semibold z-[60] transform -translate-y-20 opacity-0 transition-all duration-400 pointer-events-none flex items-center space-x-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        <span id="toast-message">Действие выполнено</span>
+      <!-- Bots List Grid -->
+      <div id="bots-list-container" class="grid gap-4 hidden"></div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT ЛОГИКА -->
-    <!-- ========================================== -->
-    <script>
-        // Состояние
-        const AppState = {
-            currentTab: 'view-bots',
-            editingBotId: null,
-            user: {
-                name: 'Александр',
-                avatar: null // DataURL
-            },
-            bots: []
-        };
+    <!-- 2. TAB: CREATE BOT -->
+    <div id="tab-create" class="tab-content space-y-8 py-4 hidden">
+      <div class="text-center max-w-sm mx-auto space-y-2">
+        <h2 class="font-serif italic text-2xl text-graphite">Спроектировать новое чудо</h2>
+        <p class="text-xs text-graphite/50 leading-relaxed">Дайте вашей идее благородное имя.</p>
+      </div>
 
-        // DOM элементы
-        const navButtons = document.querySelectorAll('.nav-btn');
-        const views = document.querySelectorAll('.view-section');
-        const botsListContainer = document.getElementById('bots-list');
-        const emptyState = document.getElementById('bots-empty-state');
-        const bottomNav = document.getElementById('bottom-nav');
-        
-        // Editor элементы
-        const viewEditor = document.getElementById('view-editor');
-        const editorTitle = document.getElementById('editor-title');
-        const codeInput = document.getElementById('code-input');
-        const codeContent = document.getElementById('code-content');
-        
-        // Утилиты
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').textContent = message;
-            toast.style.opacity = '1';
-            toast.style.transform = 'translateY(0) translateX(-50%) scale(1)';
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(-20px) translateX(-50%) scale(0.9)';
-            }, 2500);
+      <div class="max-w-md mx-auto space-y-6">
+        <div class="space-y-2">
+          <label class="text-xs font-semibold text-graphite/70 block px-1">Название проекта</label>
+          <input type="text" id="input-new-bot-name" placeholder="Тут могла быть ваша реклама..." class="w-full bg-beige border border-borderbeige rounded-2xl px-5 py-4 focus:outline-none focus:border-softbrown focus:ring-1 focus:ring-softbrown/40 text-graphite placeholder-graphite/30 text-sm tracking-tight transition-all shadow-inner-soft">
+        </div>
+
+        <button onclick="createNewBot()" class="w-full bg-graphite hover:bg-graphite/95 text-milk font-semibold text-sm py-4 rounded-2xl transition-all tracking-tight flex items-center justify-center gap-2 shadow-premium active:scale-95 transform duration-150">
+          <span>Создать проект</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. TAB: MY PROFILE -->
+    <div id="tab-profile" class="tab-content space-y-8 hidden">
+      
+      <!-- Interface Customizer Card -->
+      <div class="p-6 border border-borderbeige rounded-3xl bg-milk shadow-premium space-y-4">
+        <h3 class="font-serif italic text-lg text-graphite">Настройки среды</h3>
+        <div class="flex items-center justify-between py-2 border-b border-borderbeige/50">
+          <div>
+            <p class="text-sm font-medium">Анимации интерфейса</p>
+            <p class="text-xs text-graphite/40 font-medium">Плавные анимации элементов</p>
+          </div>
+          <button onclick="toggleAnimationsSystem()" id="toggle-animations-btn" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-softbrown">
+            <span id="toggle-animations-dot" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tariffs Showcase -->
+      <div class="space-y-4">
+        <div class="text-center space-y-1">
+          <h3 class="font-serif italic text-xl text-graphite">Планы подписки</h3>
+          <p class="text-xs text-graphite/45 font-medium">Выберите уровень контроля над архитектурой ботов</p>
+        </div>
+
+        <div class="grid gap-4">
+          <!-- FREE PLAN -->
+          <div id="plan-card-free" onclick="selectPlan('free')" class="plan-card p-5 border rounded-3xl transition-all flex flex-col justify-between shadow-premium cursor-pointer relative border-softbrown ring-1 ring-softbrown/30 bg-beige/40">
+            <div id="badge-plan-free" class="plan-badge absolute -top-2.5 right-6 bg-softbrown text-milk text-[10px] font-sans px-3 py-0.5 rounded-full uppercase tracking-wider font-semibold">Активен</div>
+            <div class="space-y-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-semibold text-lg text-graphite">Free</h4>
+                  <p class="text-xs text-graphite/40 mt-1 font-medium">Основы архитектуры</p>
+                </div>
+                <div class="text-right">
+                  <span class="font-serif italic text-xl text-graphite">0</span>
+                  <span class="text-xs text-graphite/60 block font-light">TG Stars</span>
+                </div>
+              </div>
+              <ul class="space-y-2 text-xs text-graphite/70 border-t border-borderbeige/60 pt-3">
+                <li class="flex items-center gap-2">
+                  <span class="text-softbrown font-bold">✓</span> Только текстовые команды
+                </li>
+                <li class="flex items-center gap-2 text-graphite/35">
+                  <span class="font-semibold">✕</span> Без кнопок, инлайна и алертов
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- ENCODE PLAN -->
+          <div id="plan-card-encode" onclick="selectPlan('encode')" class="plan-card p-5 border rounded-3xl transition-all flex flex-col justify-between shadow-premium cursor-pointer relative border-borderbeige bg-milk">
+            <div id="badge-plan-encode" class="plan-badge absolute -top-2.5 right-6 bg-softbrown text-milk text-[10px] font-sans px-3 py-0.5 rounded-full uppercase tracking-wider font-semibold hidden">Активен</div>
+            <div class="space-y-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-semibold text-lg text-graphite">Encode</h4>
+                  <p class="text-xs text-graphite/40 mt-1 font-medium">Продвинутый standard</p>
+                </div>
+                <div class="text-right">
+                  <span class="font-serif italic text-xl text-graphite">150</span>
+                  <span class="text-xs text-graphite/60 block font-light">Stars / мес.</span>
+                </div>
+              </div>
+              <ul class="space-y-2 text-xs text-graphite/70 border-t border-borderbeige/60 pt-3">
+                <li class="flex items-center gap-2">
+                  <span class="text-softbrown font-bold">✓</span> Доступны клавиатуры (Reply) и алерты
+                </li>
+                <li class="flex items-center gap-2 text-graphite/40">
+                  <span class="font-semibold">✕</span> Без инлайн-уведомлений и кнопок
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- PRO PLAN -->
+          <div id="plan-card-pro" onclick="selectPlan('pro')" class="plan-card p-5 border rounded-3xl transition-all flex flex-col justify-between shadow-premium cursor-pointer relative border-borderbeige bg-milk">
+            <div id="badge-plan-pro" class="plan-badge absolute -top-2.5 right-6 bg-softbrown text-milk text-[10px] font-sans px-3 py-0.5 rounded-full uppercase tracking-wider font-semibold hidden">Активен</div>
+            <div class="space-y-4">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="font-semibold text-lg text-graphite">Pro Architect</h4>
+                  <p class="text-xs text-graphite/40 mt-1 font-medium">Абсолютная свобода</p>
+                </div>
+                <div class="text-right">
+                  <span class="font-serif italic text-xl text-graphite">350</span>
+                  <span class="text-xs text-graphite/60 block font-light">Stars / мес.</span>
+                </div>
+              </div>
+              <ul class="space-y-2 text-xs text-graphite/70 border-t border-borderbeige/60 pt-3">
+                <li class="flex items-center gap-2">
+                  <span class="text-softbrown font-bold">✓</span> Разблокированы абсолютно все компоненты
+                </li>
+                <li class="flex items-center gap-2">
+                  <span class="text-softbrown font-bold">✓</span> Безлимитная привязка к сценариям и FSM
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================= -->
+    <!-- MASTERPIECE PAGE: BOT EDITOR (SPA SECTION)    -->
+    <!-- ============================================= -->
+    <div id="tab-editor" class="tab-content space-y-6 hidden">
+      
+      <!-- Back Header -->
+      <div class="flex items-center justify-between pb-3 border-b border-borderbeige">
+        <button onclick="backToBotsTab()" class="flex items-center gap-1.5 text-xs text-graphite/60 hover:text-graphite transition-all py-2 px-1.5 rounded-lg hover:bg-beige/40">
+          <span class="text-lg font-serif italic leading-none">‹</span> Назад к списку
+        </button>
+        <span id="editor-bot-title-badge" class="text-xs text-softbrown font-semibold tracking-tight bg-beige border border-borderbeige px-3 py-1 rounded-xl shadow-sm"></span>
+      </div>
+
+      <!-- Scenarios List Section -->
+      <div class="space-y-5">
+        <div class="flex justify-between items-center px-1">
+          <h3 class="font-serif italic text-xl text-graphite">Сценарии диалога</h3>
+          <button onclick="addNewScenario()" class="text-xs bg-beige border border-borderbeige text-graphite hover:bg-softbrown hover:text-milk px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-1 shadow-sm active:scale-95 transform duration-150">
+            <span class="text-sm font-light">+</span> Сценарий
+          </button>
+        </div>
+
+        <div id="scenarios-empty-state" class="py-12 text-center border border-dashed border-borderbeige/80 rounded-2xl bg-beige/10">
+          <p class="text-xs text-graphite/50 italic">Сценарии еще не созданы. Добавьте первый сценарий для настройки логики.</p>
+        </div>
+
+        <div id="scenarios-list-container" class="space-y-6"></div>
+      </div>
+
+      <!-- Editor bottom fixed action block -->
+      <div class="grid grid-cols-2 gap-3 pt-6 border-t border-borderbeige/80">
+        <button onclick="openEmulator()" class="bg-beige hover:bg-beige/80 text-graphite font-bold text-xs py-4 px-4 rounded-xl transition-all flex items-center justify-center gap-2 border border-borderbeige active:scale-95 transform duration-150 shadow-sm">
+          <svg class="w-4 h-4 text-softbrown" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+          Эмуляция бота
+        </button>
+        <button onclick="generateTelegramCode()" class="bg-graphite hover:bg-graphite/95 text-milk font-bold text-xs py-4 px-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-premium active:scale-95 transform duration-150">
+          <svg class="w-4 h-4 text-activebrown" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+          Сгенерировать код
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- BOTTOM NAVIGATION BAR (FIXED + FLOATING SYMMETRIC pill)                  -->
+  <!-- ========================================================================= -->
+  <!-- Обеспечивает безупречную центровку, парящий эффект и правильные боковые отступы -->
+  <div class="p-4 pb-6 flex-none bg-milk/10 z-40 flex justify-center w-full">
+    <nav class="h-16 w-full max-w-xs bg-milk/95 backdrop-blur-md border border-borderbeige/80 shadow-premium rounded-2xl grid grid-cols-3 items-center justify-items-center">
+      <!-- Tab 1 -->
+      <button id="nav-btn-bots" onclick="switchTab('bots')" class="w-full h-full flex flex-col items-center justify-center gap-1 select-none text-softbrown transition-all duration-150 transform active:scale-90 font-bold">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+        <span class="text-[9px] tracking-tight">Мои боты</span>
+      </button>
+      <!-- Tab 2 -->
+      <button id="nav-btn-create" onclick="switchTab('create')" class="w-full h-full flex flex-col items-center justify-center gap-1 select-none text-graphite/40 hover:text-graphite/70 transition-all duration-150 transform active:scale-90 font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span class="text-[9px] tracking-tight">Создать бота</span>
+      </button>
+      <!-- Tab 3 -->
+      <button id="nav-btn-profile" onclick="switchTab('profile')" class="w-full h-full flex flex-col items-center justify-center gap-1 select-none text-graphite/40 hover:text-graphite/70 transition-all duration-150 transform active:scale-90 font-medium">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+        <span class="text-[9px] tracking-tight">Мой профиль</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======================================================= -->
+  <!-- MODALS & OVERLAYS (ВСПЛЫВАЮЩИЕ ОКНА)                    -->
+  <!-- ======================================================= -->
+
+  <!-- 1. CONTEXT BOT MENU (EDIT / RENAME / DELETE / CLONE) -->
+  <div id="modal-context" class="fixed inset-0 bg-graphite/30 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeModalOnOuterClick(event, 'modal-context')">
+    <div class="bg-milk w-full max-w-lg rounded-t-[2.5rem] p-8 space-y-6 shadow-2xl border-t border-borderbeige transition-transform duration-300 translate-y-full" id="modal-context-content">
+      <div class="space-y-1">
+        <h4 id="context-bot-name" class="font-serif italic text-2xl text-graphite">Имя бота</h4>
+        <p class="text-xs text-graphite/45 font-medium">Выберите действие с проектом</p>
+      </div>
+
+      <div class="grid gap-3">
+        <button onclick="editActiveBot()" class="w-full flex items-center justify-between p-4 border border-borderbeige rounded-2xl bg-beige/45 hover:bg-beige/70 transition-all active:scale-[0.99] transform duration-150 shadow-sm">
+          <span class="text-sm font-bold">Редактировать сценарии</span>
+          <span class="text-xs text-softbrown font-bold">Войти в редактор ›</span>
+        </button>
+        <button onclick="openRenameModal()" class="w-full flex items-center justify-between p-4 border border-borderbeige rounded-2xl bg-milk hover:bg-beige/25 transition-all active:scale-[0.99] transform duration-150 shadow-sm">
+          <span class="text-sm font-medium">Переименовать</span>
+          <svg class="w-4 h-4 text-graphite/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
+        </button>
+        <button onclick="openCloneModal()" class="w-full flex items-center justify-between p-4 border border-borderbeige rounded-2xl bg-milk hover:bg-beige/25 transition-all active:scale-[0.99] transform duration-150 shadow-sm">
+          <span class="text-sm font-medium">Клонировать проект</span>
+          <svg class="w-4 h-4 text-graphite/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75c-.131 0-.262.007-.39.02m1.14 8.48c.09.004.18.006.27.006h3.75a1.125 1.125 0 001.125-1.125V11.25a9 9 0 00-9-9M12 12.75a1.125 1.125 0 11-2.25 0 1.125 1.125 0 012.25 0z" /></svg>
+        </button>
+        <button onclick="deleteSelectedBot()" class="w-full flex items-center justify-between p-4 border border-red-200/50 rounded-2xl bg-red-50/20 hover:bg-red-50/60 text-red-600 transition-all active:scale-[0.99] transform duration-150 shadow-sm">
+          <span class="text-sm font-semibold">Удалить проект</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+        </button>
+      </div>
+
+      <button onclick="closeActiveModal('modal-context')" class="w-full text-center py-4 text-xs font-semibold text-graphite/55 hover:text-graphite transition-all tracking-wide">
+        Отмена
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. RENAME MODAL -->
+  <div id="modal-rename" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-rename')">
+    <div class="bg-milk rounded-[2rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+      <h4 class="font-serif italic text-xl">Переименовать проект</h4>
+      <input type="text" id="input-rename-bot" class="w-full bg-beige border border-borderbeige rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-softbrown text-graphite font-medium">
+      <div class="flex gap-2 justify-end pt-2">
+        <button onclick="closeActiveModal('modal-rename')" class="text-xs font-semibold text-graphite/40 px-4 py-2 hover:text-graphite transition-all">Отмена</button>
+        <button onclick="confirmRename()" class="bg-graphite text-milk text-xs font-semibold px-5 py-2.5 rounded-xl hover:bg-graphite/90 transition-all active:scale-95">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CLONE MODAL -->
+  <div id="modal-clone" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-clone')">
+    <div class="bg-milk rounded-[2rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+      <h4 class="font-serif italic text-xl">Клонировать проект</h4>
+      <p class="text-xs text-graphite/50 leading-relaxed">Пожалуйста, укажите имя для копии бота:</p>
+      <input type="text" id="input-clone-bot" class="w-full bg-beige border border-borderbeige rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-softbrown text-graphite font-medium font-semibold">
+      <div class="flex gap-2 justify-end pt-2">
+        <button onclick="closeActiveModal('modal-clone')" class="text-xs font-semibold text-graphite/40 px-4 py-2 hover:text-graphite transition-all">Отмена</button>
+        <button onclick="confirmClone()" class="bg-graphite text-milk text-xs font-semibold px-5 py-2.5 rounded-xl hover:bg-graphite/90 transition-all active:scale-95">Клонировать</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. TARIFF LIMIT WARNING MODAL -->
+  <div id="modal-warning" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-warning')">
+    <div class="bg-milk rounded-[2.5rem] p-8 max-w-sm w-full text-center space-y-5 shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+      <div class="w-12 h-12 bg-softbrown/15 rounded-full flex items-center justify-center mx-auto text-softbrown">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+      </div>
+      <div class="space-y-2">
+        <h4 class="font-serif italic text-xl text-graphite">Функция ограничена</h4>
+        <p id="warning-modal-text" class="text-xs text-graphite/60 leading-relaxed"></p>
+      </div>
+      <div class="flex flex-col gap-2 pt-2">
+        <button onclick="closeActiveModal('modal-warning'); switchTab('profile')" class="w-full bg-graphite text-milk text-xs font-semibold py-3.5 rounded-xl hover:bg-graphite/90 transition-all shadow-premium active:scale-95">Повысить тарифный план</button>
+        <button onclick="closeActiveModal('modal-warning')" class="text-xs font-semibold text-graphite/45 py-2.5 hover:text-graphite transition-all">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. INTERACTIVE BOT EMULATOR OVERLAY -->
+  <div id="modal-emulator" class="fixed inset-0 bg-graphite/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-emulator')">
+    <div class="bg-[#F5F1E9] rounded-[2.5rem] max-w-sm w-full h-[620px] flex flex-col justify-between overflow-hidden shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+      <div class="bg-milk p-4 border-b border-borderbeige/80 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="h-9 w-9 rounded-full bg-softbrown/15 flex items-center justify-center text-softbrown font-bold text-xs">🤖</div>
+          <div>
+            <h5 id="emulator-header-bot-name" class="text-xs font-bold text-graphite flex items-center gap-1">Имя бота</h5>
+            <span class="text-[10px] text-green-600 block font-semibold">bot is online</span>
+          </div>
+        </div>
+        <button onclick="closeActiveModal('modal-emulator')" class="text-xs font-bold text-graphite/45 hover:text-graphite transition-all px-3 py-2 rounded-xl bg-beige active:scale-95">‹ Назад</button>
+      </div>
+
+      <!-- Emulator Message Feed -->
+      <div class="flex-grow p-4 overflow-y-auto space-y-3.5 flex flex-col scroll-container" id="emulator-chat-feed"></div>
+
+      <!-- Simulator Reply Keyboard -->
+      <div class="bg-milk p-4 border-t border-borderbeige/80 space-y-3">
+        <div id="emulator-reply-keyboard-container" class="grid grid-cols-2 gap-2 bg-beige/40 p-2 rounded-xl border border-borderbeige/50 hidden animate-pop"></div>
+        <div class="flex items-center gap-2">
+          <input type="text" id="input-emulator-message" onkeydown="handleEmulatorInputKey(event)" placeholder="Написать сообщение..." class="flex-grow bg-beige border border-borderbeige rounded-2xl px-4 py-3.5 text-xs focus:outline-none text-graphite font-medium">
+          <button onclick="sendEmulatorMessageFromInput()" class="h-10 w-10 shrink-0 bg-graphite text-milk rounded-full flex items-center justify-center hover:bg-graphite/90 transition-all active:scale-90">➔</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. CODE GENERATOR OVERLAY -->
+  <div id="modal-codeview" class="fixed inset-0 bg-graphite/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-codeview')">
+    <div class="bg-milk rounded-[2.5rem] max-w-lg w-full h-[640px] flex flex-col justify-between overflow-hidden shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
+      <div class="p-6 border-b border-borderbeige/80 flex justify-between items-center bg-beige/35">
+        <div>
+          <h5 class="font-serif italic text-lg text-graphite">Сгенерированный aiogram 3.x код с FSM</h5>
+          <p class="text-[10px] text-graphite/50 tracking-tight">Полностью готовый асинхронный Python-скрипт</p>
+        </div>
+        <button onclick="closeActiveModal('modal-codeview')" class="text-xs bg-graphite text-milk px-3.5 py-2 rounded-xl hover:bg-graphite/90 transition-all">Закрыть</button>
+      </div>
+
+      <div class="flex-grow p-5 overflow-auto bg-graphite text-[#D8D3C9] font-mono text-[11px] leading-relaxed select-text select-all">
+        <pre id="code-output-element" class="whitespace-pre"></pre>
+      </div>
+
+      <div class="p-5 border-t border-borderbeige bg-beige/25 flex items-center justify-between gap-3">
+        <p class="text-[9px] text-graphite/55 max-w-[280px] font-medium leading-tight">Код собирается динамически. Скопируйте и запустите на сервере с установленным пакетом <code>pip install aiogram</code>.</p>
+        <button onclick="copyGeneratedCode()" class="bg-softbrown hover:bg-softbrown/90 text-milk text-xs font-semibold px-5 py-3.5 rounded-xl transition-all shadow-premium shrink-0 active:scale-95">Скопировать код</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. LINK TO SCENARIOS DIALOG MODAL -->
+  <div id="modal-link-scenario" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-link-scenario')">
+    <div class="bg-milk rounded-[2.5rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
+      <h4 class="font-serif italic text-xl">Связать кнопку со сценарием</h4>
+      <p class="text-xs text-graphite/50 leading-relaxed">Выберите триггер-команду, которая сработает при нажатии этой кнопки:</p>
+      <div id="link-scenario-options-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+      <div class="flex justify-end pt-2">
+        <button onclick="closeActiveModal('modal-link-scenario')" class="text-xs font-semibold text-graphite/40 px-4 py-2 hover:text-graphite transition-all">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= STATE MANAGEMENT AND VANILLA JS LOGIC ================= -->
+  <script>
+    let appState = {
+      currentTab: 'bots',       
+      animationsEnabled: true,
+      selectedPlan: 'pro',     // Настройки тарифа по умолчанию PRO для удобства тестирования
+      bots: [],                 
+      selectedBot: null,        
+      activeBot: null,          
+      linkingTargetScenarioId: null,
+      linkingTargetButtonIndex: null,
+      linkingType: 'inline', // 'inline' или 'keyboard'
+      emulatorMessages: [],
+      currentEmulatorReplyKeyboard: []
+    };
+
+    window.onload = function() {
+      renderBotsTab();
+      updateNavigationUI();
+    };
+
+    function switchTab(tabName) {
+      appState.currentTab = tabName;
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.add('hidden');
+        el.classList.remove('animate-tab');
+      });
+
+      const activeTabEl = document.getElementById(`tab-${tabName}`);
+      if (activeTabEl) {
+        activeTabEl.classList.remove('hidden');
+        if (appState.animationsEnabled) {
+          activeTabEl.classList.add('animate-tab');
         }
+      }
+      document.getElementById('main-scroll-view').scrollTop = 0;
+      updateNavigationUI();
 
-        function formatDate(date) {
-            const months = ['Янв', 'Фев', 'Мар', 'Апр', 'Мая', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
-            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+      if (tabName === 'bots') {
+        renderBotsTab();
+      }
+    }
+
+    // Поддерживает класс 'w-full h-full' для идеальной центровки в парящем Grid-контейнере
+    function updateNavigationUI() {
+      const tabs = ['bots', 'create', 'profile'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`nav-btn-${t}`);
+        if (!btn) return;
+        if (appState.currentTab === t) {
+          btn.className = "w-full h-full flex flex-col items-center justify-center gap-1 select-none text-softbrown transition-all duration-150 transform active:scale-90 font-bold";
+        } else {
+          btn.className = "w-full h-full flex flex-col items-center justify-center gap-1 select-none text-graphite/40 hover:text-graphite/70 transition-all duration-150 transform active:scale-90 font-medium";
         }
+      });
+    }
 
-        function createRipple(event) {
-            const button = event.currentTarget;
-            const circle = document.createElement('span');
-            const diameter = Math.max(button.clientWidth, button.clientHeight);
-            const radius = diameter / 2;
-            
-            circle.style.width = circle.style.height = `${diameter}px`;
-            circle.style.left = `${event.clientX - button.getBoundingClientRect().left - radius}px`;
-            circle.style.top = `${event.clientY - button.getBoundingClientRect().top - radius}px`;
-            circle.classList.add('ripple-element');
-            
-            const existingRipple = button.querySelector('.ripple-element');
-            if(existingRipple) existingRipple.remove();
-            
-            button.appendChild(circle);
+    function backToBotsTab() {
+      if (appState.activeBot) {
+        const index = appState.bots.findIndex(b => b.id === appState.activeBot.id);
+        if (index !== -1) {
+          appState.bots[index] = JSON.parse(JSON.stringify(appState.activeBot));
         }
+      }
+      appState.activeBot = null;
+      switchTab('bots');
+    }
 
-        // Привязка ripple эффекта
-        document.querySelectorAll('.ripple').forEach(btn => {
-            btn.addEventListener('click', createRipple);
+    function toggleAnimationsSystem() {
+      appState.animationsEnabled = !appState.animationsEnabled;
+      const toggleBtn = document.getElementById('toggle-animations-btn');
+      const toggleDot = document.getElementById('toggle-animations-dot');
+      if (appState.animationsEnabled) {
+        document.body.classList.remove('no-transitions');
+        toggleBtn.className = "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-softbrown";
+        toggleDot.className = "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5";
+      } else {
+        document.body.classList.add('no-transitions');
+        toggleBtn.className = "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-beige";
+        toggleDot.className = "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0";
+      }
+    }
+
+    function selectPlan(plan) {
+      appState.selectedPlan = plan;
+      const plans = ['free', 'encode', 'pro'];
+      plans.forEach(p => {
+        const card = document.getElementById(`plan-card-${p}`);
+        const badge = document.getElementById(`badge-plan-${p}`);
+        if (p === plan) {
+          card.className = "plan-card p-5 border rounded-3xl transition-all flex flex-col justify-between shadow-premium cursor-pointer relative border-softbrown ring-1 ring-softbrown/30 bg-beige/40 animate-pop";
+          badge.classList.remove('hidden');
+        } else {
+          card.className = "plan-card p-5 border rounded-3xl transition-all flex flex-col justify-between shadow-premium cursor-pointer relative border-borderbeige bg-milk";
+          badge.classList.add('hidden');
+        }
+      });
+      document.getElementById('header-plan-badge').textContent = plan.toUpperCase();
+    }
+
+    // --- Умный рендеринг таба ботов (без переигрывания анимации существующих карточек) ---
+    function renderBotsTab() {
+      const countBadge = document.getElementById('bots-count-badge');
+      const emptyState = document.getElementById('bots-empty-state');
+      const listContainer = document.getElementById('bots-list-container');
+      countBadge.textContent = `${appState.bots.length} ${getBotWord(appState.bots.length)}`;
+
+      if (appState.bots.length === 0) {
+        emptyState.classList.remove('hidden');
+        listContainer.classList.add('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        listContainer.classList.remove('hidden');
+
+        // 1. Удаляем из DOM карточки тех ботов, которых больше нет в стейте
+        const activeIds = appState.bots.map(b => 'bot-card-' + b.id);
+        Array.from(listContainer.children).forEach(card => {
+          if (!activeIds.includes(card.id)) {
+            card.remove();
+          }
         });
 
-        // --- РЕНДЕР БОТОВ ---
-        function renderBots() {
-            botsListContainer.innerHTML = '';
+        // 2. Создаем новые карточки (с анимацией) или обновляем старые (без сброса анимации)
+        appState.bots.forEach(bot => {
+          const cardId = 'bot-card-' + bot.id;
+          let card = document.getElementById(cardId);
+          const isNew = !card;
+
+          if (isNew) {
+            card = document.createElement('div');
+            card.id = cardId;
+            // Анимацию запускаем ТОЛЬКО если карточка абсолютно новая
+            card.className = "p-5 border border-borderbeige rounded-2xl bg-milk hover:bg-beige/30 transition-all cursor-pointer relative group shadow-premium animate-tab";
+            listContainer.appendChild(card);
+          } else {
+            // Старую карточку оставляем стабильной
+            card.className = "p-5 border border-borderbeige rounded-2xl bg-milk hover:bg-beige/30 transition-all cursor-pointer relative group shadow-premium";
+          }
+
+          card.onclick = () => openBotContext(bot.id);
+          card.innerHTML = `
+            <div class="flex justify-between items-start gap-4">
+              <div class="space-y-1">
+                <h3 class="font-semibold text-base text-graphite tracking-tight">${escapeHTML(bot.name)}</h3>
+                <p class="text-xs text-graphite/40 mt-1 flex items-center gap-1.5 font-medium">
+                  Изменен: <span>15.02.2026</span>
+                </p>
+              </div>
+              <div class="h-8 w-8 shrink-0 rounded-full bg-beige flex items-center justify-center text-softbrown group-hover:bg-softbrown group-hover:text-milk transition-all">➔</div>
+            </div>
+            <div class="flex gap-2 mt-4 flex-wrap">
+              <span class="text-[10px] bg-beige text-softbrown px-2.5 py-1 rounded font-semibold border border-borderbeige/40">${bot.scenarios.length} сценариев</span>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function createNewBot() {
+      const input = document.getElementById('input-new-bot-name');
+      const name = input.value.trim();
+      if (!name) return;
+      appState.bots.push({
+        id: 'bot_' + Date.now(),
+        name: name,
+        scenarios: []
+      });
+      input.value = '';
+      switchTab('bots');
+    }
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (!m) return;
+      m.classList.remove('hidden');
+      setTimeout(() => {
+        const c = m.querySelector('.bg-milk') || m.querySelector('.bg-[#F5F1E9]');
+        if (c) {
+          if (id === 'modal-context') {
+            c.classList.remove('translate-y-full');
+            c.classList.add('translate-y-0');
+          } else {
+            c.classList.remove('scale-95');
+            c.classList.add('scale-100');
+          }
+        }
+      }, 50);
+    }
+
+    function closeActiveModal(id) {
+      const m = document.getElementById(id);
+      if (!m) return;
+      const c = m.querySelector('.bg-milk') || m.querySelector('.bg-[#F5F1E9]');
+      if (c) {
+        if (id === 'modal-context') {
+          c.classList.remove('translate-y-0');
+          c.classList.add('translate-y-full');
+        } else {
+          c.classList.remove('scale-100');
+          c.classList.add('scale-95');
+        }
+      }
+      setTimeout(() => m.classList.add('hidden'), 200);
+    }
+
+    function closeModalOnOuterClick(e, id) {
+      if (e.target.id === id) closeActiveModal(id);
+    }
+
+    function openBotContext(botId) {
+      const bot = appState.bots.find(b => b.id === botId);
+      if (!bot) return;
+      appState.selectedBot = bot;
+      document.getElementById('context-bot-name').textContent = bot.name;
+      openModal('modal-context');
+    }
+
+    function openRenameModal() {
+      closeActiveModal('modal-context');
+      document.getElementById('input-rename-bot').value = appState.selectedBot.name;
+      openModal('modal-rename');
+    }
+
+    function confirmRename() {
+      const newName = document.getElementById('input-rename-bot').value.trim();
+      if (!newName) return;
+      const idx = appState.bots.findIndex(b => b.id === appState.selectedBot.id);
+      if (idx !== -1) {
+        appState.bots[idx].name = newName;
+      }
+      closeActiveModal('modal-rename');
+      renderBotsTab();
+    }
+
+    function openCloneModal() {
+      closeActiveModal('modal-context');
+      document.getElementById('input-clone-bot').value = appState.selectedBot.name + ' Копия';
+      openModal('modal-clone');
+    }
+
+    function confirmClone() {
+      const cloneName = document.getElementById('input-clone-bot').value.trim();
+      if (!cloneName) return;
+      const base = appState.selectedBot;
+      const clone = JSON.parse(JSON.stringify(base));
+      clone.id = 'bot_' + Date.now();
+      clone.name = cloneName;
+      appState.bots.push(clone);
+      closeActiveModal('modal-clone');
+      renderBotsTab();
+    }
+
+    function deleteSelectedBot() {
+      appState.bots = appState.bots.filter(b => b.id !== appState.selectedBot.id);
+      closeActiveModal('modal-context');
+      renderBotsTab();
+    }
+
+    function editActiveBot() {
+      closeActiveModal('modal-context');
+      appState.activeBot = JSON.parse(JSON.stringify(appState.selectedBot));
+      document.getElementById('editor-bot-title-badge').textContent = `Редактор: ${appState.activeBot.name}`;
+      renderEditorScenarios();
+      switchTab('editor');
+    }
+
+    // --- Умный рендеринг сценариев (DOM Retention / Сохранение DOM-узлов) ---
+    function renderEditorScenarios() {
+      const container = document.getElementById('scenarios-list-container');
+      const empty = document.getElementById('scenarios-empty-state');
+      if (!appState.activeBot || appState.activeBot.scenarios.length === 0) {
+        empty.classList.remove('hidden');
+        container.innerHTML = '';
+        return;
+      }
+      empty.classList.add('hidden');
+
+      // 1. Синхронизируем DOM: Удаляем те карточки, которые были удалены из стейта
+      const activeIds = appState.activeBot.scenarios.map(s => 'scen-card-' + s.id);
+      Array.from(container.children).forEach(card => {
+        if (!activeIds.includes(card.id)) {
+          card.remove();
+        }
+      });
+
+      // 2. Отрисовываем или интеллектуально обновляем существующие карточки
+      appState.activeBot.scenarios.forEach((scen) => {
+        const cardId = 'scen-card-' + scen.id;
+        let card = document.getElementById(cardId);
+        const isNew = !card;
+
+        // Если карточка новая — создаем элемент и вешаем анимацию ПОЯВЛЕНИЯ
+        if (isNew) {
+          card = document.createElement('div');
+          card.id = cardId;
+          card.className = "p-6 border border-borderbeige rounded-3xl bg-milk shadow-premium space-y-5 relative animate-tab";
+          container.appendChild(card);
+        } else {
+          // Если карточка уже была на экране — сохраняем её класс стабильным, БЕЗ анимации
+          card.className = "p-6 border border-borderbeige rounded-3xl bg-milk shadow-premium space-y-5 relative";
+        }
+
+        // Вычисляем, изменилась ли видимость внутренних блоков для точечной микро-анимации под-блоков
+        const wasKeyboardVisible = card.querySelector('.keyboard-box') && !card.querySelector('.keyboard-box').classList.contains('hidden');
+        const wasAlertVisible = card.querySelector('.alert-box') && !card.querySelector('.alert-box').classList.contains('hidden');
+        const wasInlineVisible = card.querySelector('.inline-box') && !card.querySelector('.inline-box').classList.contains('hidden');
+        const wasButtonsVisible = card.querySelector('.buttons-box') && !card.querySelector('.buttons-box').classList.contains('hidden');
+
+        // Микро-анимация применяется ТОЛЬКО если блок переходит из скрытого в видимое состояние!
+        const keyboardAnimClass = (scen.hasKeyboard && !wasKeyboardVisible) ? 'animate-pop' : '';
+        const alertAnimClass = (scen.hasAlert && !wasAlertVisible) ? 'animate-pop' : '';
+        const inlineAnimClass = (scen.hasInlineNotif && !wasInlineVisible) ? 'animate-pop' : '';
+        const buttonsAnimClass = (scen.hasButtons && !wasButtonsVisible) ? 'animate-pop' : '';
+
+        // Перерисовываем содержимое (без сброса общего DOM-контейнера карточки)
+        card.innerHTML = `
+          <!-- Delete button -->
+          <button onclick="deleteScenario('${scen.id}')" class="absolute top-5 right-5 text-graphite/30 hover:text-red-500 transition-all text-xs p-1 rounded-lg hover:bg-beige/40">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          </button>
+
+          <!-- Header с чекбоксом "Уникальный" -->
+          <div class="flex justify-between items-center max-w-[82%] pb-2 border-b border-borderbeige/40">
+            <div class="space-y-0.5">
+              <span class="text-[10px] font-bold text-graphite/45 uppercase tracking-wider">Тип Сценария</span>
+            </div>
+            <label class="flex items-center gap-2 cursor-pointer bg-beige/40 border border-borderbeige px-2.5 py-1 rounded-lg">
+              <input type="checkbox" ${scen.isUnique ? 'checked' : ''} onchange="toggleUniqueScenario('${scen.id}')" class="rounded border-borderbeige text-softbrown focus:ring-softbrown/40 h-3.5 w-3.5">
+              <span class="text-[10px] font-bold text-graphite/80 tracking-wide">Уникальный скрытый</span>
+            </label>
+          </div>
+
+          <!-- Trigger command field -->
+          <div class="space-y-2 max-w-[82%]">
+            <label class="text-[10px] font-bold text-graphite/50 tracking-widest uppercase">Триггер-команда</label>
+            <div class="relative">
+              <span class="absolute left-4 top-3 text-sm text-graphite/45 font-medium">/</span>
+              <input type="text" value="${escapeHTML(scen.command)}" oninput="updateScenarioField('${scen.id}', 'command', this.value)" placeholder="например, start" class="w-full bg-beige border border-borderbeige rounded-xl pl-7 pr-4 py-3 text-xs font-mono focus:outline-none focus:border-softbrown text-graphite transition-all shadow-inner-soft">
+            </div>
+          </div>
+
+          <!-- Response text -->
+          <div class="space-y-2">
+            <label class="text-[10px] font-bold text-graphite/50 tracking-widest uppercase">Ответный Текст</label>
+            <textarea oninput="updateScenarioField('${scen.id}', 'responseText', this.value)" placeholder="Сообщение бота..." rows="2" class="w-full bg-beige border border-borderbeige rounded-xl px-4 py-3.5 text-xs focus:outline-none focus:border-softbrown text-graphite placeholder-graphite/30 transition-all shadow-inner-soft leading-relaxed">${escapeHTML(scen.responseText)}</textarea>
+          </div>
+
+          <!-- Component Checkboxes -->
+          <div class="space-y-3 pt-1">
+            <label class="text-[10px] font-bold text-graphite/50 tracking-widest uppercase">Комплектующие сценария</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center gap-3 p-3 border border-borderbeige/60 bg-beige/30 rounded-xl cursor-pointer hover:bg-beige/60 transition-all">
+                <input type="checkbox" ${scen.hasKeyboard ? 'checked' : ''} onchange="toggleComponent('${scen.id}', 'hasKeyboard')" class="rounded border-borderbeige text-softbrown h-4 w-4">
+                <span class="text-xs text-graphite/85 font-medium">Клавиатура</span>
+              </label>
+              <label class="flex items-center gap-3 p-3 border border-borderbeige/60 bg-beige/30 rounded-xl cursor-pointer hover:bg-beige/60 transition-all">
+                <input type="checkbox" ${scen.hasAlert ? 'checked' : ''} onchange="toggleComponent('${scen.id}', 'hasAlert')" class="rounded border-borderbeige text-softbrown h-4 w-4">
+                <span class="text-xs text-graphite/85 font-medium">Алерты</span>
+              </label>
+              <label class="flex items-center gap-3 p-3 border border-borderbeige/60 bg-beige/30 rounded-xl cursor-pointer hover:bg-beige/60 transition-all">
+                <input type="checkbox" ${scen.hasInlineNotif ? 'checked' : ''} onchange="toggleComponent('${scen.id}', 'hasInlineNotif')" class="rounded border-borderbeige text-softbrown h-4 w-4">
+                <span class="text-xs text-graphite/85 font-medium">Инлайн увед-ия</span>
+              </label>
+              <label class="flex items-center gap-3 p-3 border border-borderbeige/60 bg-beige/30 rounded-xl cursor-pointer hover:bg-beige/60 transition-all">
+                <input type="checkbox" ${scen.hasButtons ? 'checked' : ''} onchange="toggleComponent('${scen.id}', 'hasButtons')" class="rounded border-borderbeige text-softbrown h-4 w-4">
+                <span class="text-xs text-graphite/85 font-medium">Кнопки</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- DYNAMIC SUB-VIEWS (С независимой покадровой анимацией появления) -->
+          <div class="space-y-4 pt-1">
             
-            if (AppState.bots.length === 0) {
-                botsListContainer.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-                return;
-            }
-
-            botsListContainer.classList.remove('hidden');
-            emptyState.classList.add('hidden');
-
-            AppState.bots.forEach((bot, index) => {
-                const botHTML = `
-                    <div class="bot-card bg-panel rounded-[24px] p-5 shadow-sm border border-black/5 flex flex-col space-y-4">
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 rounded-2xl bg-accent-light flex items-center justify-center text-accent">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                                </div>
-                                <div>
-                                    <h3 class="font-heading text-xl font-bold text-espresso">${bot.name}</h3>
-                                    <p class="text-coffee text-xs font-medium mt-1">Изменен: ${bot.date}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center space-x-2 pt-2 border-t border-black/5">
-                            <!-- Изменить -->
-                            <button onclick="openEditor(${bot.id})" class="flex-1 bg-accent/10 text-accent py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center space-x-2 active:scale-95 transition-transform">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                                <span>Изменить</span>
-                            </button>
-                            
-                            <!-- Отправить -->
-                            <button onclick="sendCodeToBot(${bot.id})" class="flex-1 bg-surface text-espresso border border-black/10 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center space-x-2 active:scale-95 transition-transform">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                                <span>В чат</span>
-                            </button>
-
-                            <!-- Удалить -->
-                            <button onclick="deleteBot(${bot.id})" class="w-11 bg-red-50 text-danger py-2.5 rounded-xl flex items-center justify-center active:scale-95 transition-transform">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            </button>
-                        </div>
+            <!-- REPLY KEYBOARD BOX -->
+            <div class="keyboard-box p-4 border border-borderbeige rounded-2xl bg-beige/20 space-y-3 ${scen.hasKeyboard ? keyboardAnimClass : 'hidden'}">
+              <div class="flex justify-between items-center gap-2">
+                <span class="text-xs font-bold text-softbrown uppercase tracking-wider">Reply-Клавиатура</span>
+                <button onclick="addKeyboardButton('${scen.id}')" class="text-[11px] bg-softbrown text-milk px-3 py-1.5 rounded-lg font-semibold shadow-sm">
+                  + Кнопка
+                </button>
+              </div>
+              <div class="space-y-3">
+                ${scen.keyboardButtons.map((btn, bIdx) => `
+                  <div class="p-3 border border-borderbeige/60 bg-milk rounded-xl flex flex-col gap-2 relative shadow-sm">
+                    <button onclick="removeKeyboardButton('${scen.id}', ${bIdx})" class="absolute top-2 right-2.5 text-graphite/40 hover:text-red-500 font-semibold text-xs p-1">Удалить</button>
+                    <div class="space-y-1">
+                      <label class="text-[8px] text-graphite/45 uppercase font-bold tracking-wider">Текст на кнопке</label>
+                      <input type="text" value="${escapeHTML(btn.text)}" oninput="updateKeyboardButtonField('${scen.id}', ${bIdx}, 'text', this.value)" class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-1.5 text-xs font-semibold">
                     </div>
-                `;
-                botsListContainer.insertAdjacentHTML('beforeend', botHTML);
-            });
-        }
+                    <div class="space-y-2">
+                      <div class="flex justify-between items-center">
+                        <label class="text-[8px] text-graphite/45 uppercase font-bold tracking-wider">Действие при клике</label>
+                        <button onclick="openScenarioLinkForComponent('${scen.id}', ${bIdx}, 'keyboard')" class="text-[9px] text-softbrown hover:underline font-bold">Связать сценарий</button>
+                      </div>
+                      <input type="text" value="${escapeHTML(btn.actionValue)}" oninput="updateKeyboardButtonField('${scen.id}', ${bIdx}, 'actionValue', this.value)" placeholder="Текст ответа или имя команды..." class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-1.5 text-xs focus:outline-none font-medium">
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
 
-        // --- ДЕЙСТВИЯ С БОТАМИ ---
-        function deleteBot(id) {
-            AppState.bots = AppState.bots.filter(b => b.id !== id);
-            renderBots();
-            showToast('Проект удален');
-        }
+            <!-- ALERTS BOX -->
+            <div class="alert-box p-4 border border-borderbeige rounded-2xl bg-beige/20 space-y-2 ${scen.hasAlert ? alertAnimClass : 'hidden'}">
+              <span class="text-xs font-bold text-softbrown uppercase tracking-wider block">Всплывающий Алерт (с кнопкой OK)</span>
+              <input type="text" value="${escapeHTML(scen.alertText)}" oninput="updateScenarioField('${scen.id}', 'alertText', this.value)" placeholder="Сообщение..." class="w-full bg-milk border border-borderbeige rounded-xl px-3.5 py-2.5 text-xs font-medium focus:border-softbrown">
+            </div>
 
-        function sendCodeToBot(id) {
-            showToast('Код отправлен в чат бота!');
-        }
+            <!-- INLINE NOTIFICATION BOX -->
+            <div class="inline-box p-4 border border-borderbeige rounded-2xl bg-beige/20 space-y-2 ${scen.hasInlineNotif ? inlineAnimClass : 'hidden'}">
+              <span class="text-xs font-bold text-softbrown uppercase tracking-wider block">Инлайн уведомление (без OK)</span>
+              <input type="text" value="${escapeHTML(scen.inlineNotifText)}" oninput="updateScenarioField('${scen.id}', 'inlineNotifText', this.value)" placeholder="Сообщение..." class="w-full bg-milk border border-borderbeige rounded-xl px-3.5 py-2.5 text-xs font-medium focus:border-softbrown">
+            </div>
 
-        // --- РЕДАКТОР КОДА ---
-        function syncEditor() {
-            let text = codeInput.value;
-            // Предотвращение бага с последней пустой строкой в Prism
-            if(text[text.length-1] == "\n") {
-                text += " ";
-            }
-            // Экранирование HTML
-            text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            codeContent.innerHTML = text;
-            Prism.highlightElement(codeContent);
-        }
+            <!-- INLINE BUTTONS BOX -->
+            <div class="buttons-box p-4 border border-borderbeige rounded-2xl bg-beige/20 space-y-3 ${scen.hasButtons ? buttonsAnimClass : 'hidden'}">
+              <div class="flex justify-between items-center gap-2">
+                <span class="text-xs font-bold text-softbrown uppercase tracking-wider">Инлайн Кнопки под сообщением</span>
+                <button onclick="addInlineButton('${scen.id}')" class="text-[11px] bg-softbrown text-milk px-3 py-1.5 rounded-lg font-semibold shadow-sm">
+                  + Инлайн кнопка
+                </button>
+              </div>
+              <div class="space-y-3">
+                ${scen.inlineButtons.map((ibtn, ibIdx) => `
+                  <div class="p-4 border border-borderbeige rounded-2xl bg-milk flex flex-col gap-3 relative shadow-sm">
+                    <button onclick="removeInlineButton('${scen.id}', ${ibIdx})" class="absolute top-3 right-3 text-graphite/40 hover:text-red-500 text-xs font-semibold p-1">Удалить</button>
+                    <div class="grid grid-cols-2 gap-3">
+                      <div class="space-y-1">
+                        <label class="text-[9px] text-graphite/45 uppercase font-bold tracking-wider">Текст кнопки</label>
+                        <input type="text" value="${escapeHTML(ibtn.text)}" oninput="updateInlineButtonField('${scen.id}', ${ibIdx}, 'text', this.value)" placeholder="Кнопка" class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-2 text-xs font-medium">
+                      </div>
+                      <div class="space-y-1">
+                        <label class="text-[9px] text-graphite/45 uppercase font-bold tracking-wider">Тип действия</label>
+                        <select onchange="updateInlineButtonField('${scen.id}', ${ibIdx}, 'actionType', this.value)" class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none">
+                          <option value="text" ${ibtn.actionType === 'text' ? 'selected' : ''}>Текст</option>
+                          <option value="alert" ${ibtn.actionType === 'alert' ? 'selected' : ''}>Алерт</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="space-y-2">
+                      <div class="flex justify-between items-center">
+                        <label class="text-[9px] text-graphite/45 uppercase font-bold tracking-wider">Значение действия</label>
+                        <button onclick="openScenarioLinkForComponent('${scen.id}', ${ibIdx}, 'inline')" class="text-[10px] text-softbrown hover:underline font-semibold flex items-center gap-1">
+                          Связать сценарий <span class="text-[8px] bg-softbrown/10 text-softbrown px-1 rounded font-extrabold">PRO</span>
+                        </button>
+                      </div>
+                      <input type="text" value="${escapeHTML(ibtn.actionValue)}" oninput="updateInlineButtonField('${scen.id}', ${ibIdx}, 'actionValue', this.value)" placeholder="Ответ..." class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-2 text-xs font-medium">
+                    </div>
+                    ${(ibtn.linkedScenarios && ibtn.linkedScenarios.length > 0) ? `
+                      <div class="flex gap-1.5 flex-wrap mt-1">
+                        ${ibtn.linkedScenarios.map(lnk => `
+                          <span class="text-[9px] bg-beige text-graphite/70 border border-borderbeige px-2 py-0.5 rounded-lg flex items-center gap-1 font-semibold animate-pop">
+                            <span>/${escapeHTML(lnk)}</span>
+                            <button onclick="unlinkScenario('${scen.id}', ${ibIdx}, '${escapeHTML(lnk)}')" class="text-red-500 font-bold hover:text-red-700 ml-0.5">×</button>
+                          </span>
+                        `).join('')}
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
 
-        codeInput.addEventListener('input', syncEditor);
+    function addNewScenario() {
+      appState.activeBot.scenarios.push({
+        id: 'scen_' + Date.now(),
+        command: 'command_' + (appState.activeBot.scenarios.length + 1),
+        responseText: 'Ответ на этот сценарий',
+        isUnique: false,
+        hasKeyboard: false,
+        keyboardButtons: [],
+        hasAlert: false,
+        alertText: 'Внимание!',
+        hasInlineNotif: false,
+        inlineNotifText: 'Успешно!',
+        hasButtons: false,
+        inlineButtons: []
+      });
+      renderEditorScenarios();
+    }
+
+    function deleteScenario(scenId) {
+      appState.activeBot.scenarios = appState.activeBot.scenarios.filter(s => s.id !== scenId);
+      renderEditorScenarios();
+    }
+
+    function updateScenarioField(scenId, field, value) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen) {
+        scen[field] = value;
+      }
+    }
+
+    function toggleUniqueScenario(scenId) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen) {
+        scen.isUnique = !scen.isUnique;
+        renderEditorScenarios();
+      }
+    }
+
+    function toggleComponent(scenId, field) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (!scen) return;
+
+      if (appState.selectedPlan === 'free') {
+        showWarning('На бесплатном плане доступны только текстовые ответы на команды. Использование клавиатур, алертов, инлайн кнопок и связывания невозможно.');
+        renderEditorScenarios(); 
+        return;
+      }
+
+      if (appState.selectedPlan === 'encode') {
+        if (field === 'hasInlineNotif' || field === 'hasButtons') {
+          showWarning('Тариф ENCODE не включает в себя инлайн-уведомления и инлайн-кнопки под сообщениями. Оформите тариф PRO для разблокировки.');
+          renderEditorScenarios();
+          return;
+        }
+      }
+
+      scen[field] = !scen[field];
+
+      if (scen.hasKeyboard && scen.keyboardButtons.length === 0) {
+        scen.keyboardButtons = [
+          { text: 'Помощь', actionValue: 'Помощь' },
+          { text: 'О нас', actionValue: 'О нас' }
+        ];
+      }
+      if (scen.hasButtons && scen.inlineButtons.length === 0) {
+        scen.inlineButtons = [{ text: 'Перейти', actionType: 'text', actionValue: 'Вы нажали инлайн кнопку!', linkedScenarios: [] }];
+      }
+
+      renderEditorScenarios();
+    }
+
+    function showWarning(text) {
+      document.getElementById('warning-modal-text').textContent = text;
+      openModal('modal-warning');
+    }
+
+    function addKeyboardButton(scenId) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen) {
+        scen.keyboardButtons.push({
+          text: 'Кнопка ' + (scen.keyboardButtons.length + 1),
+          actionValue: 'Действие'
+        });
+        renderEditorScenarios();
+      }
+    }
+
+    function updateKeyboardButtonField(scenId, idx, field, value) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen && scen.keyboardButtons[idx]) {
+        scen.keyboardButtons[idx][field] = value;
+      }
+    }
+
+    function removeKeyboardButton(scenId, idx) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen) {
+        scen.keyboardButtons.splice(idx, 1);
+        renderEditorScenarios();
+      }
+    }
+
+    function addInlineButton(scenId) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen) {
+        scen.inlineButtons.push({
+          text: 'Кнопка ' + (scen.inlineButtons.length + 1),
+          actionType: 'text',
+          actionValue: 'Вы нажали кнопку!',
+          linkedScenarios: []
+        });
+        renderEditorScenarios();
+      }
+    }
+
+    function updateInlineButtonField(scenId, bIdx, field, value) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen && scen.inlineButtons[bIdx]) {
+        scen.inlineButtons[bIdx][field] = value;
+      }
+    }
+
+    function removeInlineButton(scenId, bIdx) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen) {
+        scen.inlineButtons.splice(bIdx, 1);
+        renderEditorScenarios();
+      }
+    }
+
+    function openScenarioLinkForComponent(scenId, bIdx, type) {
+      if (type === 'inline' && appState.selectedPlan !== 'pro') {
+        showWarning('Связывание инлайн кнопок со сценариями доступно только в тарифном плане PRO.');
+        return;
+      }
+      appState.linkingTargetScenarioId = scenId;
+      appState.linkingTargetButtonIndex = bIdx;
+      appState.linkingType = type;
+
+      const container = document.getElementById('link-scenario-options-container');
+      container.innerHTML = '';
+
+      appState.activeBot.scenarios.forEach(scen => {
+        const option = document.createElement('div');
+        option.className = "p-3.5 border border-borderbeige rounded-xl bg-beige/25 hover:bg-softbrown hover:text-milk transition-all cursor-pointer text-xs font-semibold flex justify-between items-center shadow-sm active:scale-95 transform duration-150";
+        option.onclick = () => confirmScenarioLinkAction(scen.command);
+        option.innerHTML = `<span>/${escapeHTML(scen.command)}</span> <span class="text-[10px] opacity-70">Связать ›</span>`;
+        container.appendChild(option);
+      });
+
+      openModal('modal-link-scenario');
+    }
+
+    function confirmScenarioLinkAction(cmd) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === appState.linkingTargetScenarioId);
+      if (!scen) return;
+
+      if (appState.linkingType === 'keyboard') {
+        const btn = scen.keyboardButtons[appState.linkingTargetButtonIndex];
+        if (btn) {
+          btn.actionValue = '/' + cmd;
+        }
+      } else {
+        const btn = scen.inlineButtons[appState.linkingTargetButtonIndex];
+        if (btn) {
+          if (!btn.linkedScenarios) btn.linkedScenarios = [];
+          if (!btn.linkedScenarios.includes(cmd)) {
+            btn.linkedScenarios.push(cmd);
+          }
+        }
+      }
+      closeActiveModal('modal-link-scenario');
+      renderEditorScenarios();
+    }
+
+    function unlinkScenario(scenId, bIdx, cmd) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      if (scen && scen.inlineButtons[bIdx]) {
+        scen.inlineButtons[bIdx].linkedScenarios = scen.inlineButtons[bIdx].linkedScenarios.filter(x => x !== cmd);
+        renderEditorScenarios();
+      }
+    }
+
+
+    // ==========================================
+    // ИНТЕРАКТИВНЫЙ ЭМУЛЯТОР TELEGRAM-БОТА
+    // ==========================================
+    function openEmulator() {
+      document.getElementById('emulator-header-bot-name').textContent = appState.activeBot.name;
+      appState.emulatorMessages = [
+        { sender: 'bot', text: `Привет! Я эмулирую вашего бота "${appState.activeBot.name}".\n\nНапишите команду, чтобы запустить сценарий.` }
+      ];
+      appState.currentEmulatorReplyKeyboard = [];
+      renderEmulatorMessages();
+      openModal('modal-emulator');
+    }
+
+    function renderEmulatorMessages() {
+      const feed = document.getElementById('emulator-chat-feed');
+      feed.innerHTML = '';
+
+      appState.emulatorMessages.forEach(msg => {
+        const bubble = document.createElement('div');
+        bubble.className = msg.sender === 'user' 
+          ? 'self-end bg-softbrown text-milk rounded-2xl rounded-tr-none p-3.5 max-w-[85%] text-xs shadow-premium space-y-2 animate-pop' 
+          : 'self-start bg-milk text-graphite rounded-2xl rounded-tl-none p-3.5 max-w-[85%] text-xs shadow-premium space-y-2 animate-pop';
         
-        // Синхронизация скролла
-        codeInput.addEventListener('scroll', () => {
-            document.getElementById('code-display').scrollTop = codeInput.scrollTop;
-            document.getElementById('code-display').scrollLeft = codeInput.scrollLeft;
-        });
-
-        // Поддержка табуляции
-        codeInput.addEventListener('keydown', function(e) {
-            if (e.key == 'Tab') {
-                e.preventDefault();
-                let start = this.selectionStart;
-                let end = this.selectionEnd;
-                // Вставка 4 пробелов
-                this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
-                this.selectionStart = this.selectionEnd = start + 4;
-                syncEditor();
-            }
-        });
-
-        window.openEditor = function(id) {
-            const bot = AppState.bots.find(b => b.id === id);
-            if(!bot) return;
-
-            AppState.editingBotId = id;
-            editorTitle.textContent = bot.name + '.py';
-            codeInput.value = bot.code;
-            syncEditor();
-
-            // Показываем редактор, скрываем навбар
-            viewEditor.classList.remove('hidden');
-            // Небольшая задержка для применения display:block перед анимацией
-            setTimeout(() => {
-                viewEditor.classList.remove('translate-y-full');
-                bottomNav.style.transform = 'translateY(100%)';
-            }, 10);
-        }
-
-        function closeEditor() {
-            viewEditor.classList.add('translate-y-full');
-            bottomNav.style.transform = 'translateY(0)';
-            setTimeout(() => {
-                viewEditor.classList.add('hidden');
-                AppState.editingBotId = null;
-            }, 500);
-        }
-
-        document.getElementById('editor-back-btn').addEventListener('click', closeEditor);
-
-        document.getElementById('editor-save-btn').addEventListener('click', () => {
-            if(AppState.editingBotId) {
-                const botIndex = AppState.bots.findIndex(b => b.id === AppState.editingBotId);
-                if(botIndex > -1) {
-                    AppState.bots[botIndex].code = codeInput.value;
-                    AppState.bots[botIndex].date = formatDate(new Date());
-                    renderBots();
-                    showToast('Скрипт сохранен');
-                    closeEditor();
-                }
-            }
-        });
-
-        // --- НАВИГАЦИЯ ---
-        navButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const targetId = e.currentTarget.getAttribute('data-target');
-                if (AppState.currentTab === targetId) return;
-
-                navButtons.forEach(b => b.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-
-                views.forEach(view => {
-                    if (view.id === targetId) {
-                        view.classList.add('active');
-                        // Рестарт анимации
-                        view.style.animation = 'none';
-                        view.offsetHeight; /* trigger reflow */
-                        view.style.animation = null;
-                    } else {
-                        view.classList.remove('active');
-                    }
-                });
-
-                AppState.currentTab = targetId;
-            });
-        });
-
-        // --- СОЗДАНИЕ БОТА ---
-        const createForm = document.getElementById('create-bot-form');
-        createForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const nameInput = document.getElementById('bot-name');
-            const name = nameInput.value.trim();
-            
-            if(!name) return;
-
-            const newBot = {
-                id: Date.now(),
-                name: name,
-                date: formatDate(new Date()),
-                code: ""
-            };
-            
-            AppState.bots.unshift(newBot);
-            nameInput.value = '';
-            
-            showToast(`Проект "${name}" инициализирован`);
-            
-            // Переключение на список
-            renderBots();
-            document.querySelector('[data-target="view-bots"]').click();
-        });
-
-        // --- ПРОФИЛЬ ---
-        function updateProfileInitials() {
-            if (AppState.user.avatar) return; // Если есть картинка, инициалы не нужны
-            
-            const name = AppState.user.name.trim();
-            let initials = "AM";
-            if (name.length > 0) {
-                const parts = name.split(' ');
-                initials = parts.length > 1 
-                    ? (parts[0][0] + parts[1][0]).toUpperCase()
-                    : name.substring(0, 2).toUpperCase();
-            }
-            document.getElementById('profile-initials').textContent = initials;
-            document.getElementById('profile-initials').style.display = 'block';
-        }
-
-        const nameInput = document.getElementById('profile-name-input');
-        nameInput.addEventListener('input', (e) => {
-            AppState.user.name = e.target.value;
-            updateProfileInitials();
-        });
-
-        // Загрузка Аватара (кастомизация)
-        const avatarUpload = document.getElementById('avatar-upload');
-        const avatarPreview = document.getElementById('avatar-preview');
+        let htmlContent = `<p class="whitespace-pre-line leading-relaxed font-medium">${escapeHTML(msg.text)}</p>`;
         
-        avatarUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    AppState.user.avatar = event.target.result;
-                    avatarPreview.style.backgroundImage = `url(${AppState.user.avatar})`;
-                    document.getElementById('profile-initials').style.display = 'none';
-                    showToast('Аватар обновлен');
+        if (msg.inlineButtons && msg.inlineButtons.length > 0) {
+          htmlContent += `<div class="grid grid-cols-2 gap-2 pt-2 border-t border-borderbeige/45 mt-2">`;
+          msg.inlineButtons.forEach((ibtn) => {
+            htmlContent += `
+              <button onclick="triggerInlineButtonSimulation('${escapeHTML(ibtn.text)}', '${escapeHTML(ibtn.actionType)}', '${escapeHTML(ibtn.actionValue)}', '${escapeHTML(JSON.stringify(ibtn.linkedScenarios || []))}')" class="text-[10px] bg-beige text-graphite hover:bg-softbrown hover:text-milk transition-all py-2 px-2.5 rounded-xl font-bold border border-borderbeige/40 shadow-sm active:scale-95">
+                ${escapeHTML(ibtn.text)}
+              </button>
+            `;
+          });
+          htmlContent += `</div>`;
+        }
+
+        bubble.innerHTML = htmlContent;
+        feed.appendChild(bubble);
+      });
+
+      const kbContainer = document.getElementById('emulator-reply-keyboard-container');
+      if (appState.currentEmulatorReplyKeyboard && appState.currentEmulatorReplyKeyboard.length > 0) {
+        kbContainer.classList.remove('hidden');
+        kbContainer.innerHTML = '';
+        appState.currentEmulatorReplyKeyboard.forEach(btnObj => {
+          const btn = document.createElement('button');
+          btn.className = "bg-milk text-graphite py-2.5 rounded-xl text-xs font-semibold border border-borderbeige/85 hover:bg-beige transition-all shadow-sm active:scale-95 animate-pop";
+          btn.onclick = () => sendEmulatorMessageText(btnObj.text, btnObj.actionValue);
+          btn.textContent = btnObj.text;
+          kbContainer.appendChild(btn);
+        });
+      } else {
+        kbContainer.classList.add('hidden');
+      }
+
+      setTimeout(() => {
+        feed.scrollTop = feed.scrollHeight;
+      }, 50);
+    }
+
+    function handleEmulatorInputKey(event) {
+      if (event.key === 'Enter') {
+        sendEmulatorMessageFromInput();
+      }
+    }
+
+    function sendEmulatorMessageFromInput() {
+      const input = document.getElementById('input-emulator-message');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      sendEmulatorMessageText(text, null);
+    }
+
+    function sendEmulatorMessageText(text, directActionValue) {
+      appState.emulatorMessages.push({ sender: 'user', text: text });
+      renderEmulatorMessages();
+
+      setTimeout(() => {
+        if (directActionValue && directActionValue.startsWith('/')) {
+          text = directActionValue;
+        } else if (directActionValue) {
+          appState.emulatorMessages.push({
+            sender: 'bot',
+            text: directActionValue
+          });
+          renderEmulatorMessages();
+          return;
+        }
+
+        const searchCmd = text.startsWith('/') ? text.slice(1).trim() : text.trim();
+        const matched = appState.activeBot.scenarios.find(s => {
+          const cleanCmd = s.command.replace(/^\//, '').trim();
+          return cleanCmd.toLowerCase() === searchCmd.toLowerCase();
+        });
+
+        if (matched) {
+          appState.emulatorMessages.push({
+            sender: 'bot',
+            text: matched.responseText || 'Ответ сценария',
+            inlineButtons: matched.hasButtons ? matched.inlineButtons : []
+          });
+
+          if (matched.hasAlert) {
+            showEmulatorSystemToast('Алерт: ' + matched.alertText);
+          }
+          if (matched.hasInlineNotif) {
+            showEmulatorSystemToast('Уведомление: ' + matched.inlineNotifText);
+          }
+
+          if (matched.hasKeyboard) {
+            appState.currentEmulatorReplyKeyboard = matched.keyboardButtons;
+          } else {
+            appState.currentEmulatorReplyKeyboard = [];
+          }
+
+        } else {
+          appState.emulatorMessages.push({
+            sender: 'bot',
+            text: `Действие "${text}" не привязано к сценарию.`
+          });
+        }
+        renderEmulatorMessages();
+      }, 400);
+    }
+
+    function triggerInlineButtonSimulation(btnText, actionType, actionValue, linkedScenariosStr) {
+      appState.emulatorMessages.push({ sender: 'user', text: `[Клик на инлайн: ${btnText}]` });
+      renderEmulatorMessages();
+
+      const linkedScenarios = JSON.parse(linkedScenariosStr);
+
+      setTimeout(() => {
+        if (linkedScenarios && linkedScenarios.length > 0) {
+          const targetCmd = linkedScenarios[0];
+          sendEmulatorMessageText('/' + targetCmd, null);
+        } else {
+          if (actionType === 'alert') {
+            showEmulatorSystemToast('Алерт: ' + actionValue);
+          } else {
+            appState.emulatorMessages.push({
+              sender: 'bot',
+              text: actionValue || 'Действие инлайн кнопки выполнено.'
+            });
+            renderEmulatorMessages();
+          }
+        }
+      }, 300);
+    }
+
+    function showEmulatorSystemToast(text) {
+      const toast = document.createElement('div');
+      toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-graphite/95 text-milk text-[11px] px-5 py-3 rounded-2xl shadow-xl z-50 border border-borderbeige/30 transition-all text-center font-medium max-w-[90%] leading-relaxed animate-pop';
+      toast.innerHTML = text;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 200);
+      }, 2500);
+    }
+
+
+    // =========================================================
+    // PROFESSIONAL CODE GENERATOR (aiogram 3.x + CLEAN FSM LOGIC)
+    // =========================================================
+    function generateTelegramCode() {
+      const botName = appState.activeBot.name;
+      
+      let pyCode = `#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Скрипт создан в конструкторе Architect UI.
+Архитектура бота: ${botName}
+Библиотека: aiogram 3.x (Рекомендуемая версия с FSM)
+Инструкция по запуску:
+1. Установите библиотеки: pip install aiogram asyncio
+2. Вставьте ваш токен в переменную BOT_TOKEN
+3. Запустите скрипт: python main.py
+"""
+
+import asyncio
+import logging
+import sys
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.filters import Command, CommandStart
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.context import FSMContext
+from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
+
+# Токен вашего бота. Замените перед запуском!
+BOT_TOKEN = "ВАШ_ТЕЛЕГРАМ_ТОКЕН_ЗДЕСЬ"
+
+# Конфигурация логирования для отладки
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+
+# Инициализация бота и диспетчера
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
+
+# --- АВТОМАТ СОСТОЯНИЙ (FSM) ДЛЯ ИЗОЛЯЦИИ КНОПОК ---
+# Позволяет боту точно знать, на каком шаге диалога находится каждый пользователь.
+class BotStates(StatesGroup):
+`;
+
+      // Динамически объявляем стейты для каждого сценария, чтобы не было конфликтов
+      appState.activeBot.scenarios.forEach((scen, idx) => {
+        const validStateName = `state_${scen.command.replace(/[^a-zA-Z0-9]/g, '_')}_${idx}`;
+        pyCode += `    ${validStateName} = State() # Стейт для сценария /${scen.command.replace(/^\//, '')}\n`;
+      });
+
+      appState.activeBot.scenarios.forEach((scen, idx) => {
+        const cleanCmd = scen.command.replace(/^\//, '').trim();
+        const validStateName = `BotStates.state_${scen.command.replace(/[^a-zA-Z0-9]/g, '_')}_${idx}`;
+        const handlerName = `handler_${cleanCmd.replace(/[^a-zA-Z0-9]/g, '_')}_${idx}`;
+        const escapedText = (scen.responseText || '').replace(/"/g, '\\"');
+
+        pyCode += `\n# --- СЦЕНАРИЙ: /${cleanCmd} ---\n`;
+        
+        // Если сценарий не уникальный — вешаем на него обычную глобальную команду
+        if (!scen.isUnique) {
+          if (cleanCmd.toLowerCase() === 'start') {
+            pyCode += `@dp.message(CommandStart())\n`;
+          } else {
+            pyCode += `@dp.message(Command("${cleanCmd}"))\n`;
+          }
+          pyCode += `async def ${handlerName}(message: types.Message, state: FSMContext):\n`;
+          pyCode += `    """Обработка команды /${cleanCmd}"""\n`;
+          pyCode += `    await state.set_state(${validStateName})\n`;
+        } else {
+          // Уникальный сценарий вызывается только внутренней логикой кнопок
+          pyCode += `# Скрытый уникальный сценарий (вызывается через привязанные кнопки)\n`;
+          pyCode += `async def run_hidden_${handlerName}(message: types.Message, state: FSMContext):\n`;
+          pyCode += `    await state.set_state(${validStateName})\n`;
+        }
+
+        // Рендерим клавиатуру, если она активирована в UI
+        if (scen.hasKeyboard && scen.keyboardButtons.length > 0) {
+          pyCode += `    kb = ReplyKeyboardBuilder()\n`;
+          scen.keyboardButtons.forEach(b => {
+            pyCode += `    kb.button(text="${b.text.replace(/"/g, '\\"')}")\n`;
+          });
+          pyCode += `    kb.adjust(2)\n`;
+          pyCode += `    markup = kb.as_markup(resize_keyboard=True, one_time_keyboard=True)\n`;
+          pyCode += `    await message.answer(text="${escapedText}", reply_markup=markup)\n`;
+        } else {
+          pyCode += `    await message.answer(text="${escapedText}")\n`;
+        }
+
+        // ОБРАБОТЧИКИ НАЖАТИЯ КНОПОК ДЛЯ ДАННОГО ШАГА (Строго внутри стейта!)
+        if (scen.hasKeyboard && scen.keyboardButtons.length > 0) {
+          scen.keyboardButtons.forEach((b, bIdx) => {
+            const btnHandlerName = `btn_${cleanCmd}_i${idx}_b${bIdx}`;
+            pyCode += `\n# Кнопка "${b.text}" на шаге /${cleanCmd}\n`;
+            pyCode += `@dp.message(F.text == "${b.text.replace(/"/g, '\\"')}", ${validStateName})\n`;
+            pyCode += `async def ${btnHandlerName}(message: types.Message, state: FSMContext):\n`;
+
+            if (b.actionValue.startsWith('/')) {
+              const targetCmd = b.actionValue.replace(/^\//, '').trim();
+              const targetIdx = appState.activeBot.scenarios.findIndex(x => x.command.trim().toLowerCase() === targetCmd.toLowerCase());
+              
+              if (targetIdx !== -1) {
+                const targetScen = appState.activeBot.scenarios[targetIdx];
+                const targetHandlerBase = `handler_${targetScen.command.replace(/[^a-zA-Z0-9]/g, '_')}_${targetIdx}`;
+                
+                pyCode += `    # Безопасный переход на связанный сценарий без дублирования кода\n`;
+                if (targetScen.isUnique) {
+                  pyCode += `    await run_hidden_${targetHandlerBase}(message, state)\n`;
+                } else {
+                  pyCode += `    await ${targetHandlerBase}(message, state)\n`;
                 }
-                reader.readAsDataURL(file);
+              } else {
+                pyCode += `    await message.answer("Переход не настроен")\n`;
+              }
+            } else {
+              pyCode += `    await message.answer("${b.actionValue.replace(/"/g, '\\"')}")\n`;
             }
-        });
+          });
+        }
+      });
 
-        // Покупка за Telegram Stars
-        document.getElementById('buy-stars-btn').addEventListener('click', function(e) {
-            createRipple(e);
-            setTimeout(() => {
-                showToast('Транзакция Telegram Stars отправлена');
-                // Здесь будет API вызов Telegram WebApp для Stars
-                if(window.Telegram && window.Telegram.WebApp) {
-                    // MOCK: Вызов метода инвойса
-                }
-            }, 600);
-        });
+      pyCode += `\n# --- ГЛАВНАЯ ТОЧКА ВХОДА И ЗАПУСК ---\nasync def main():\n    print("Бот успешно запущен с защитой FSM!")\n    await dp.start_polling(bot)\n\nif __name__ == "__main__":\n    try:\n        asyncio.run(main())\n    except (KeyboardInterrupt, SystemExit):\n        pass\n`;
+      
+      document.getElementById('code-output-element').textContent = pyCode;
+      openModal('modal-codeview');
+    }
 
-        // --- ИНИЦИАЛИЗАЦИЯ ---
-        document.addEventListener('DOMContentLoaded', () => {
-            renderBots();
-            updateProfileInitials();
-            
-            // Telegram WebApp Setup
-            if (window.Telegram && window.Telegram.WebApp) {
-                const twa = window.Telegram.WebApp;
-                twa.ready();
-                twa.expand();
-                twa.setHeaderColor('#FDFBF7');
-                twa.setBackgroundColor('#FDFBF7');
-                // Подставляем имя из ТГ
-                if(twa.initDataUnsafe && twa.initDataUnsafe.user) {
-                    AppState.user.name = twa.initDataUnsafe.user.first_name;
-                    nameInput.value = AppState.user.name;
-                    updateProfileInitials();
-                }
-            }
-        });
+    function copyGeneratedCode() {
+      const codeText = document.getElementById('code-output-element').textContent;
+      const tempEl = document.createElement('textarea');
+      tempEl.value = codeText;
+      document.body.appendChild(tempEl);
+      tempEl.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempEl);
+      showEmulatorSystemToast('Python-код скопирован в буфер!');
+    }
 
-    </script>
+    function getBotWord(count) {
+      if (count % 10 === 1 && count % 100 !== 11) return 'проект';
+      if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'проекта';
+      return 'проектов';
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+  </script>
+
 </body>
 </html>
