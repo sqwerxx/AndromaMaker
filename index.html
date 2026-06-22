@@ -466,7 +466,7 @@
 
   <!-- 6. CODE GENERATOR OVERLAY -->
   <div id="modal-codeview" class="fixed inset-0 bg-graphite/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-codeview')">
-    <div class="bg-milk rounded-[2.5rem] max-w-lg w-full h-[640px] flex flex-col justify-between overflow-hidden shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
+    <div class="bg-milk rounded-[2.5rem] max-w-lg w-full h-[640px] flex flex-col justify-between overflow-hidden shadow-2xl border-borderbeige scale-95 transition-all duration-200">
       <div class="p-6 border-b border-borderbeige/80 flex justify-between items-center bg-beige/35">
         <div>
           <h5 class="font-serif italic text-lg text-graphite">Сгенерированный aiogram 3.x код с FSM</h5>
@@ -488,7 +488,7 @@
 
   <!-- 7. LINK TO SCENARIOS DIALOG MODAL -->
   <div id="modal-link-scenario" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-link-scenario')">
-    <div class="bg-milk rounded-[2.5rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
+    <div class="bg-milk rounded-[2.5rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border-borderbeige scale-95 transition-all duration-200">
       <h4 class="font-serif italic text-xl">Связать кнопку со сценарием</h4>
       <p class="text-xs text-graphite/50 leading-relaxed">Выберите триггер-команду, которая сработает при нажатии этой кнопки:</p>
       <div id="link-scenario-options-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
@@ -1318,16 +1318,31 @@
     function generateTelegramCode() {
       const botName = appState.activeBot.name;
       
+      const escapePyStr = (str) => {
+        if (!str) return '';
+        return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+      };
+
+      const safeId = (str) => {
+        return str.replace(/[^a-zA-Z0-9_]/g, '_');
+      };
+
+      const cleanCmd = (cmd) => {
+        return cmd.replace(/^\//, '').trim();
+      };
+
       let pyCode = `#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
-Скрипт создан в конструкторе Architect UI.
+Скрипт создан в профессиональном конструкторе Architect UI.
 Архитектура бота: ${botName}
-Библиотека: aiogram 3.x (Рекомендуемая версия с FSM)
+Движок генерации: Aiogram 3.x Production Engine
+Стандарт: PEP 8, Полная асинхронность, Изоляция состояний (FSM)
+
 Инструкция по запуску:
-1. Установите библиотеки: pip install aiogram asyncio
-2. Вставьте ваш токен в переменную BOT_TOKEN
+1. Установите зависимость: pip install aiogram
+2. Вставьте токен в переменную BOT_TOKEN
 3. Запустите скрипт: python main.py
 """
 
@@ -1340,99 +1355,155 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
-# Токен вашего бота. Замените перед запуском!
+# Токен вашего бота. Замените на актуальный из @BotFather!
 BOT_TOKEN = "ВАШ_ТЕЛЕГРАМ_ТОКЕН_ЗДЕСЬ"
 
-# Конфигурация логирования для отладки
+# Конфигурация логирования для отладки и мониторинга
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 
-# Инициализация бота и диспетчера
+# Инициализация бота и главного диспетчера событий
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# --- АВТОМАТ СОСТОЯНИЙ (FSM) ДЛЯ ИЗОЛЯЦИИ КНОПОК ---
-# Позволяет боту точно знать, на каком шаге диалога находится каждый пользователь.
+# --- КЛАСС СОСТОЯНИЙ (FSM STATES) ---
+# Каждый сценарий имеет изолированное состояние для защиты кнопок от ложных срабатываний.
 class BotStates(StatesGroup):
 `;
 
       // Динамически объявляем стейты для каждого сценария, чтобы не было конфликтов
       appState.activeBot.scenarios.forEach((scen, idx) => {
-        const validStateName = `state_${scen.command.replace(/[^a-zA-Z0-9]/g, '_')}_${idx}`;
-        pyCode += `    ${validStateName} = State() # Стейт для сценария /${scen.command.replace(/^\//, '')}\n`;
+        const c = cleanCmd(scen.command);
+        pyCode += `    state_${safeId(c)}_${idx} = State()  # Состояние для сценария /${c}\n`;
       });
 
       appState.activeBot.scenarios.forEach((scen, idx) => {
-        const cleanCmd = scen.command.replace(/^\//, '').trim();
-        const validStateName = `BotStates.state_${scen.command.replace(/[^a-zA-Z0-9]/g, '_')}_${idx}`;
-        const handlerName = `handler_${cleanCmd.replace(/[^a-zA-Z0-9]/g, '_')}_${idx}`;
-        const escapedText = (scen.responseText || '').replace(/"/g, '\\"');
+        const c = cleanCmd(scen.command);
+        const stateVar = `BotStates.state_${safeId(c)}_${idx}`;
+        const handlerName = `handler_${safeId(c)}_${idx}`;
+        const escapedText = escapePyStr(scen.responseText || '');
 
-        pyCode += `\n# --- СЦЕНАРИЙ: /${cleanCmd} ---\n`;
-        
-        // Если сценарий не уникальный — вешаем на него обычную глобальную команду
+        pyCode += `\n# ==========================================\n`;
+        pyCode += `# СЦЕНАРИЙ: /${c}\n`;
+        pyCode += `# ==========================================\n`;
+
         if (!scen.isUnique) {
-          if (cleanCmd.toLowerCase() === 'start') {
+          if (c.toLowerCase() === 'start') {
             pyCode += `@dp.message(CommandStart())\n`;
           } else {
-            pyCode += `@dp.message(Command("${cleanCmd}"))\n`;
+            pyCode += `@dp.message(Command("${c}"))\n`;
           }
           pyCode += `async def ${handlerName}(message: types.Message, state: FSMContext):\n`;
-          pyCode += `    """Обработка команды /${cleanCmd}"""\n`;
-          pyCode += `    await state.set_state(${validStateName})\n`;
+          pyCode += `    """Публичный хендлер для команды /${c}"""\n`;
+          pyCode += `    await state.set_state(${stateVar})\n`;
         } else {
-          // Уникальный сценарий вызывается только внутренней логикой кнопок
-          pyCode += `# Скрытый уникальный сценарий (вызывается через привязанные кнопки)\n`;
+          pyCode += `# Скрытый сценарий (доступен только через связанные переходы кнопок)\n`;
           pyCode += `async def run_hidden_${handlerName}(message: types.Message, state: FSMContext):\n`;
-          pyCode += `    await state.set_state(${validStateName})\n`;
+          pyCode += `    """Внутренний хендлер для скрытого шага /${c}"""\n`;
+          pyCode += `    await state.set_state(${stateVar})\n`;
         }
 
-        // Рендерим клавиатуру, если она активирована в UI
-        if (scen.hasKeyboard && scen.keyboardButtons.length > 0) {
-          pyCode += `    kb = ReplyKeyboardBuilder()\n`;
-          scen.keyboardButtons.forEach(b => {
-            pyCode += `    kb.button(text="${b.text.replace(/"/g, '\\"')}")\n`;
+        // Reply keyboard
+        if (scen.hasKeyboard && scen.keyboardButtons && scen.keyboardButtons.length > 0) {
+          pyCode += `    # Сборка экранной клавиатуры (Reply Keyboard)\n`;
+          pyCode += `    kb_builder = ReplyKeyboardBuilder()\n`;
+          scen.keyboardButtons.forEach(btn => {
+            pyCode += `    kb_builder.button(text="${escapePyStr(btn.text)}")\n`;
           });
-          pyCode += `    kb.adjust(2)\n`;
-          pyCode += `    markup = kb.as_markup(resize_keyboard=True, one_time_keyboard=True)\n`;
-          pyCode += `    await message.answer(text="${escapedText}", reply_markup=markup)\n`;
+          pyCode += `    kb_builder.adjust(2)  # Автоматическая сетка кнопок по 2 в ряд\n`;
+          pyCode += `    markup = kb_builder.as_markup(resize_keyboard=True, one_time_keyboard=True)\n`;
+          pyCode += `    await message.answer(text="${escapedText}", reply_markup=markup)\n\n`;
+        } 
+        // Inline keyboard
+        else if (scen.hasButtons && scen.inlineButtons && scen.inlineButtons.length > 0) {
+          pyCode += `    # Сборка встроенных кнопок (Inline Keyboard)\n`;
+          pyCode += `    inline_builder = InlineKeyboardBuilder()\n`;
+          scen.inlineButtons.forEach((ibtn, bIdx) => {
+            pyCode += `    inline_builder.button(text="${escapePyStr(ibtn.text)}", callback_data="cb_${safeId(c)}_${idx}_${bIdx}")\n`;
+          });
+          pyCode += `    inline_builder.adjust(2)  # Кнопки по 2 в ряд\n`;
+          pyCode += `    markup = inline_builder.as_markup()\n`;
+          pyCode += `    await message.answer(text="${escapedText}", reply_markup=markup)\n\n`;
         } else {
-          pyCode += `    await message.answer(text="${escapedText}")\n`;
+          pyCode += `    await message.answer(text="${escapedText}")\n\n`;
         }
 
-        // ОБРАБОТЧИКИ НАЖАТИЯ КНОПОК ДЛЯ ДАННОГО ШАГА (Строго внутри стейта!)
-        if (scen.hasKeyboard && scen.keyboardButtons.length > 0) {
-          scen.keyboardButtons.forEach((b, bIdx) => {
-            const btnHandlerName = `btn_${cleanCmd}_i${idx}_b${bIdx}`;
-            pyCode += `\n# Кнопка "${b.text}" на шаге /${cleanCmd}\n`;
-            pyCode += `@dp.message(F.text == "${b.text.replace(/"/g, '\\"')}", ${validStateName})\n`;
+        // Reply buttons handlers
+        if (scen.hasKeyboard && scen.keyboardButtons && scen.keyboardButtons.length > 0) {
+          scen.keyboardButtons.forEach((btn, bIdx) => {
+            const btnHandlerName = `reply_click_${safeId(c)}_${idx}_b${bIdx}`;
+            pyCode += `# Обработка клика по кнопке "${btn.text}" на шаге /${c}\n`;
+            pyCode += `@dp.message(F.text == "${escapePyStr(btn.text)}", ${stateVar})\n`;
             pyCode += `async def ${btnHandlerName}(message: types.Message, state: FSMContext):\n`;
 
-            if (b.actionValue.startsWith('/')) {
-              const targetCmd = b.actionValue.replace(/^\//, '').trim();
-              const targetIdx = appState.activeBot.scenarios.findIndex(x => x.command.trim().toLowerCase() === targetCmd.toLowerCase());
-              
+            const action = btn.actionValue ? btn.actionValue.trim() : '';
+            if (action.startsWith('/')) {
+              const targetCmd = cleanCmd(action);
+              const targetIdx = appState.activeBot.scenarios.findIndex(s => cleanCmd(s.command).toLowerCase() === targetCmd.toLowerCase());
               if (targetIdx !== -1) {
                 const targetScen = appState.activeBot.scenarios[targetIdx];
-                const targetHandlerBase = `handler_${targetScen.command.replace(/[^a-zA-Z0-9]/g, '_')}_${targetIdx}`;
-                
-                pyCode += `    # Безопасный переход на связанный сценарий без дублирования кода\n`;
+                const targetHandler = `handler_${safeId(targetCmd)}_${targetIdx}`;
+                pyCode += `    # Переход на связанный сценарий /${targetCmd}\n`;
                 if (targetScen.isUnique) {
-                  pyCode += `    await run_hidden_${targetHandlerBase}(message, state)\n`;
+                  pyCode += `    await run_hidden_${targetHandler}(message, state)\n\n`;
                 } else {
-                  pyCode += `    await ${targetHandlerBase}(message, state)\n`;
+                  pyCode += `    await ${targetHandler}(message, state)\n\n`;
                 }
               } else {
-                pyCode += `    await message.answer("Переход не настроен")\n`;
+                pyCode += `    await message.answer(text="Ошибка перехода: сценарий /${targetCmd} не найден в конструкторе.")\n\n`;
               }
             } else {
-              pyCode += `    await message.answer("${b.actionValue.replace(/"/g, '\\"')}")\n`;
+              pyCode += `    await message.answer(text="${escapePyStr(action || 'Действие выполнено')}")\n\n`;
+            }
+          });
+        }
+
+        // Inline buttons handlers
+        if (scen.hasButtons && scen.inlineButtons && scen.inlineButtons.length > 0) {
+          scen.inlineButtons.forEach((ibtn, bIdx) => {
+            const callbackData = `cb_${safeId(c)}_${idx}_${bIdx}`;
+            const cbHandlerName = `inline_click_${safeId(c)}_${idx}_b${bIdx}`;
+            pyCode += `# Обработка клика по встроенной кнопке "${ibtn.text}" на шаге /${c}\n`;
+            pyCode += `@dp.callback_query(F.data == "${callbackData}", ${stateVar})\n`;
+            pyCode += `async def ${cbHandlerName}(callback: types.CallbackQuery, state: FSMContext):\n`;
+
+            if (ibtn.actionType === 'alert') {
+              pyCode += `    # Показ всплывающего алерта в Telegram\n`;
+              pyCode += `    await callback.answer(text="${escapePyStr(ibtn.actionValue)}", show_alert=True)\n`;
+            } else {
+              pyCode += `    # Отправка текстового сообщения в ответ на клик\n`;
+              pyCode += `    await callback.message.answer(text="${escapePyStr(ibtn.actionValue)}")\n`;
+              pyCode += `    await callback.answer()  # Убираем часики загрузки у кнопки\n`;
+            }
+
+            if (ibtn.linkedScenarios && ibtn.linkedScenarios.length > 0) {
+              const targetCmd = cleanCmd(ibtn.linkedScenarios[0]);
+              const targetIdx = appState.activeBot.scenarios.findIndex(s => cleanCmd(s.command).toLowerCase() === targetCmd.toLowerCase());
+              if (targetIdx !== -1) {
+                const targetScen = appState.activeBot.scenarios[targetIdx];
+                const targetHandler = `handler_${safeId(targetCmd)}_${targetIdx}`;
+                pyCode += `    # Переход на связанный сценарий /${targetCmd}\n`;
+                
+                if (targetScen.hasAlert) {
+                  pyCode += `    await callback.answer(text="${escapePyStr(targetScen.alertText)}", show_alert=True)\n`;
+                } else if (targetScen.hasInlineNotif) {
+                  pyCode += `    await callback.answer(text="${escapePyStr(targetScen.inlineNotifText)}", show_alert=False)\n`;
+                }
+
+                if (targetScen.isUnique) {
+                  pyCode += `    await run_hidden_${targetHandler}(callback.message, state)\n\n`;
+                } else {
+                  pyCode += `    await ${targetHandler}(callback.message, state)\n\n`;
+                }
+              } else {
+                pyCode += `    await callback.message.answer(text="Ошибка перехода: сценарий /${targetCmd} не найден.")\n\n`;
+              }
             }
           });
         }
       });
 
-      pyCode += `\n# --- ГЛАВНАЯ ТОЧКА ВХОДА И ЗАПУСК ---\nasync def main():\n    print("Бот успешно запущен с защитой FSM!")\n    await dp.start_polling(bot)\n\nif __name__ == "__main__":\n    try:\n        asyncio.run(main())\n    except (KeyboardInterrupt, SystemExit):\n        pass\n`;
-      
+      pyCode += `\n# --- ГЛАВНАЯ ТОЧКА ВХОДА И ЗАПУСК ---\nasync def main():\n    print("Бот успешно запущен с профессиональной защитой FSM!")\n    await dp.start_polling(bot)\n\nif __name__ == "__main__":\n    try:\n        asyncio.run(main())\n    except (KeyboardInterrupt, SystemExit):\n        pass\n`;
+
       document.getElementById('code-output-element').textContent = pyCode;
       openModal('modal-codeview');
     }
