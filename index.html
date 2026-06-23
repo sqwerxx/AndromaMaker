@@ -13,6 +13,9 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <script>
     tailwind.config = {
       theme: {
@@ -1599,6 +1602,76 @@ class BotStates(StatesGroup):
         }[tag] || tag)
       );
     }
+
+    // 1. Инициализируем Supabase (подставь свои данные из настроек Project Settings -> API)
+const SUPABASE_URL = 'https://xhbxfawzxkapfzramfej.supabase.co/';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoYnhmYXd6eGthcGZ6cmFtZmVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDUxNzUsImV4cCI6MjA5NzgyMTE3NX0.2UB5h-HiCUv48eGsxxYsQEUAcxaSN5WXYQ9PZ46iWEo';
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Получаем telegram_id из WebApp.initData
+const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+const telegramId = tgUser ? String(tgUser.id) : 'local_dev_user'; // Для тестов на ПК
+
+// 2. Функция сохранения проекта в базу
+async function saveProjectToSupabase(botName, botConfig) {
+    try {
+        // Проверяем, есть ли уже проект с таким именем у этого юзера
+        const { data: existing, error: searchError } = await supabase
+            .from('projects')
+            .select('id')
+            .eq('user_id', telegramId)
+            .eq('bot_name', botName)
+            .single();
+
+        if (existing) {
+            // Если есть — обновляем конфиг
+            const { error } = await supabase
+                .from('projects')
+                .update({ config: botConfig })
+                .eq('id', existing.id);
+            if (error) throw error;
+            console.log(`Проект ${botName} успешно обновлен!`);
+        } else {
+            // Если нет — создаем новый
+            const { error } = await supabase
+                .from('projects')
+                .insert([{ user_id: telegramId, bot_name: botName, config: botConfig }]);
+            if (error) throw error;
+            console.log(`Новый проект ${botName} успешно создан!`);
+        }
+    } catch (err) {
+        console.error('Ошибка при сохранении в Supabase:', err.message);
+    }
+}
+
+// 3. Функция загрузки всех проектов пользователя при старте
+async function loadProjectsFromSupabase() {
+    try {
+        const { data, error } = await supabase
+            .from('projects')
+            .select('bot_name, config')
+            .eq('user_id', telegramId);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            // Наполняем наш appState.bots данными из базы
+            appState.bots = {};
+            data.forEach(item => {
+                appState.bots[item.bot_name] = item.config;
+            });
+            console.log('Проекты успешно загружены из Supabase!', appState.bots);
+            // Тут можно вызвать функцию обновления UI твоего конструктора, если нужно
+        }
+    } catch (err) {
+        console.error('Ошибка при загрузке из Supabase:', err.message);
+    }
+}
+
+// Автоматически загружаем проекты при открытии Mini App
+document.addEventListener('DOMContentLoaded', () => {
+    loadProjectsFromSupabase();
+});
   </script>
 
 </body>
