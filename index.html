@@ -13,7 +13,7 @@
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Supabase JS Client -->
+  <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <script>
@@ -65,10 +65,10 @@
 
     /* Премиальные тени и глубина */
     .shadow-premium {
-      box-shadow: 0 16px 40px -10px rgba(197, 168, 128, 0.22), 0 2px 6px rgba(0, 0, 0, 0.02);
+      box-shadow: 0 20px 50px -12px rgba(197, 168, 128, 0.25), 0 4px 12px rgba(0, 0, 0, 0.02);
     }
     .shadow-inner-soft {
-      box-shadow: inset 0 2px 6px 0 rgba(0, 0, 0, 0.04);
+      box-shadow: inset 0 2px 8px 0 rgba(197, 168, 128, 0.08);
     }
 
     /* Возможность мгновенного отключения переходов */
@@ -92,7 +92,7 @@
     @keyframes popIn {
       from {
         opacity: 0;
-        transform: scale(0.95) translateY(10px);
+        transform: scale(0.96) translateY(12px);
       }
       to {
         opacity: 1;
@@ -108,7 +108,7 @@
       }
       to {
         opacity: 1;
-        max-height: 600px;
+        max-height: 800px;
         transform: translateY(0);
       }
     }
@@ -128,15 +128,16 @@
     }
   </style>
 </head>
-<body class="h-screen w-screen flex flex-col justify-between relative overflow-hidden">
+<body class="h-screen w-screen flex flex-col justify-between relative overflow-hidden bg-milk">
 
   <!-- ================= TOP HEADER (Строго фиксирован) ================= -->
-  <header class="h-20 flex-none px-6 border-b border-borderbeige/60 bg-milk/95 backdrop-blur-md z-40 flex justify-between items-center shadow-sm">
+  <header class="h-20 flex-none px-6 border-b border-borderbeige bg-milk/95 backdrop-blur-md z-45 flex justify-between items-center shadow-sm">
     <div class="animate-tab">
       <h1 class="font-serif italic text-2xl tracking-wide text-graphite flex items-center gap-2 select-none">
         Architect
+        <span id="cloud-status-badge" class="text-[9px] not-italic bg-emerald-50 text-emerald-700 border border-emerald-150 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold">Облако активно</span>
       </h1>
-      <p class="text-[11px] text-graphite/60 tracking-tight mt-0.5 font-medium">Конструктор телеграм-ботов на aiogram</p>
+      <p class="text-[11px] text-graphite/50 tracking-tight mt-0.5 font-medium">Конструктор телеграм-ботов на aiogram 3.x</p>
     </div>
   </header>
 
@@ -146,20 +147,20 @@
     <!-- 1. TAB: MY BOTS -->
     <div id="tab-bots" class="tab-content space-y-6">
       <div class="flex justify-between items-center px-1">
-        <h2 class="text-lg font-medium tracking-tight">Мои проекты</h2>
-        <span id="bots-count-badge" class="text-xs text-graphite/40 font-bold">0 проектов</span>
+        <h2 class="text-base font-semibold tracking-tight text-graphite/80 font-serif italic">Ваши проекты</h2>
+        <span id="bots-count-badge" class="text-[11px] text-graphite/40 font-bold uppercase tracking-wider bg-beige px-2.5 py-1 rounded-lg border border-borderbeige/60">0 проектов</span>
       </div>
 
       <!-- Empty State (Пустое состояние) -->
-      <div id="bots-empty-state" class="py-16 px-6 text-center border border-dashed border-borderbeige rounded-[2rem] bg-beige/20 flex flex-col items-center justify-center space-y-4 shadow-sm animate-tab">
-        <div class="w-12 h-12 rounded-full bg-beige flex items-center justify-center text-softbrown shadow-sm">
+      <div id="bots-empty-state" class="py-16 px-6 text-center border border-dashed border-softbrown/30 rounded-[2rem] bg-beige/10 flex flex-col items-center justify-center space-y-4 shadow-sm animate-tab">
+        <div class="w-12 h-12 rounded-full bg-beige flex items-center justify-center text-softbrown shadow-sm border border-borderbeige/50">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
         </div>
         <div class="space-y-1">
           <p class="font-serif italic text-base text-graphite/80">Чистый лист возможностей</p>
-          <p class="text-xs text-graphite/45 max-w-[260px] leading-relaxed">У вас пока нет спроектированных ботов. Создайте свой первый проект во вкладке меню ниже.</p>
+          <p class="text-xs text-graphite/45 max-w-[260px] leading-relaxed">Проекты ещё не созданы. Самое время набросать изысканную архитектуру нового бота.</p>
         </div>
-        <button onclick="switchTab('create')" class="mt-2 text-xs bg-graphite text-milk px-6 py-3 rounded-full hover:bg-graphite/90 transition-all font-semibold tracking-tight shadow-sm active:scale-95 transform duration-150">
+        <button onclick="switchTab('create')" class="mt-2 text-xs bg-graphite text-milk px-7 py-3.5 rounded-xl hover:bg-graphite/90 transition-all font-semibold tracking-tight shadow-sm active:scale-95 transform duration-150">
           Создать проект
         </button>
       </div>
@@ -172,13 +173,13 @@
     <div id="tab-create" class="tab-content space-y-8 py-4 hidden">
       <div class="text-center max-w-sm mx-auto space-y-2">
         <h2 class="font-serif italic text-2xl text-graphite">Спроектировать новое чудо</h2>
-        <p class="text-xs text-graphite/50 leading-relaxed">Дайте вашей идее благородное имя.</p>
+        <p class="text-xs text-graphite/50 leading-relaxed">Дайте вашей идее благородное и лаконичное имя.</p>
       </div>
 
       <div class="max-w-md mx-auto space-y-6">
         <div class="space-y-2">
           <label class="text-xs font-semibold text-graphite/70 block px-1">Название проекта</label>
-          <input type="text" id="input-new-bot-name" placeholder="Тут могла быть ваша реклама..." class="w-full bg-beige border border-borderbeige rounded-2xl px-5 py-4 focus:outline-none focus:border-softbrown focus:ring-1 focus:ring-softbrown/40 text-graphite placeholder-graphite/30 text-sm tracking-tight transition-all shadow-inner-soft">
+          <input type="text" id="input-new-bot-name" placeholder="Например, Мой Бутик Бот..." class="w-full bg-beige border border-borderbeige rounded-2xl px-5 py-4 focus:outline-none focus:border-softbrown focus:ring-1 focus:ring-softbrown/40 text-graphite placeholder-graphite/30 text-sm tracking-tight transition-all shadow-inner-soft font-medium">
         </div>
 
         <button onclick="createNewBot()" class="w-full bg-graphite hover:bg-graphite/95 text-milk font-semibold text-sm py-4 rounded-2xl transition-all tracking-tight flex items-center justify-center gap-2 shadow-premium active:scale-95 transform duration-150">
@@ -197,7 +198,7 @@
         <div class="flex items-center justify-between py-2 border-b border-borderbeige/50">
           <div>
             <p class="text-sm font-medium">Анимации интерфейса</p>
-            <p class="text-xs text-graphite/40 font-medium">Плавные анимации элементов</p>
+            <p class="text-xs text-graphite/40 font-medium">Плавные переходы элементов</p>
           </div>
           <button onclick="toggleAnimationsSystem()" id="toggle-animations-btn" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none bg-softbrown">
             <span id="toggle-animations-dot" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-5"></span>
@@ -298,10 +299,10 @@
       
       <!-- Back Header -->
       <div class="flex items-center justify-between pb-3 border-b border-borderbeige">
-        <button onclick="backToBotsTab()" class="flex items-center gap-1.5 text-xs text-graphite/60 hover:text-graphite transition-all py-2 px-1.5 rounded-lg hover:bg-beige/40">
+        <button onclick="backToBotsTab()" class="flex items-center gap-1.5 text-xs text-graphite/60 hover:text-graphite transition-all py-2 px-2.5 rounded-xl hover:bg-beige/40">
           <span class="text-lg font-serif italic leading-none">‹</span> Назад к списку
         </button>
-        <span id="editor-bot-title-badge" class="text-xs text-softbrown font-semibold tracking-tight bg-beige border border-borderbeige px-3 py-1 rounded-xl shadow-sm"></span>
+        <span id="editor-bot-title-badge" class="text-xs text-softbrown font-semibold tracking-tight bg-beige border border-borderbeige/80 px-3.5 py-1.5 rounded-xl shadow-sm"></span>
       </div>
 
       <!-- Scenarios List Section -->
@@ -314,10 +315,10 @@
         </div>
 
         <div id="scenarios-empty-state" class="py-12 text-center border border-dashed border-borderbeige/80 rounded-2xl bg-beige/10">
-          <p class="text-xs text-graphite/50 italic">Сценарии еще не созданы. Добавьте первый сценарий для настройки логики.</p>
+          <p class="text-xs text-graphite/50 italic font-serif">Сценарии еще не созданы. Добавьте первый сценарий для настройки логики.</p>
         </div>
 
-        <div id="scenarios-list-container" class="space-y-6"></div>
+        <div id="scenarios-list-container" class="space-y-8"></div>
       </div>
 
       <!-- Editor bottom fixed action block -->
@@ -339,9 +340,8 @@
   <!-- ========================================================================= -->
   <!-- BOTTOM NAVIGATION BAR (FIXED + FLOATING SYMMETRIC pill)                  -->
   <!-- ========================================================================= -->
-  <!-- Обеспечивает безупречную центровку, парящий эффект и правильные боковые отступы -->
   <div class="p-4 pb-6 flex-none bg-milk/10 z-40 flex justify-center w-full">
-    <nav class="h-16 w-full max-w-xs bg-milk/95 backdrop-blur-md border border-borderbeige/80 shadow-premium rounded-2xl grid grid-cols-3 items-center justify-items-center">
+    <nav class="h-16 w-full max-w-xs bg-milk/95 backdrop-blur-md border border-borderbeige shadow-premium rounded-2xl grid grid-cols-3 items-center justify-items-center">
       <!-- Tab 1 -->
       <button id="nav-btn-bots" onclick="switchTab('bots')" class="w-full h-full flex flex-col items-center justify-center gap-1 select-none text-softbrown transition-all duration-150 transform active:scale-90 font-bold">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:20px;height:20px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
@@ -365,7 +365,7 @@
   <!-- ======================================================= -->
 
   <!-- 1. CONTEXT BOT MENU (EDIT / RENAME / DELETE / CLONE) -->
-  <div id="modal-context" class="fixed inset-0 bg-graphite/30 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeModalOnOuterClick(event, 'modal-context')">
+  <div id="modal-context" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-end justify-center hidden" onclick="closeModalOnOuterClick(event, 'modal-context')">
     <div class="bg-milk w-full max-w-lg rounded-t-[2.5rem] p-8 space-y-6 shadow-2xl border-t border-borderbeige transition-transform duration-300 translate-y-full" id="modal-context-content">
       <div class="space-y-1">
         <h4 id="context-bot-name" class="font-serif italic text-2xl text-graphite">Имя бота</h4>
@@ -385,7 +385,7 @@
           <span class="text-sm font-medium">Клонировать проект</span>
           <svg class="w-4 h-4 text-graphite/40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376A8.965 8.965 0 0012 12.75c-.131 0-.262.007-.39.02m1.14 8.48c.09.004.18.006.27.006h3.75a1.125 1.125 0 001.125-1.125V11.25a9 9 0 00-9-9M12 12.75a1.125 1.125 0 11-2.25 0 1.125 1.125 0 012.25 0z" /></svg>
         </button>
-        <button onclick="deleteSelectedBot()" class="w-full flex items-center justify-between p-4 border border-red-200/50 rounded-2xl bg-red-50/20 hover:bg-red-50/60 text-red-600 transition-all active:scale-[0.99] transform duration-150 shadow-sm">
+        <button onclick="triggerSelectedBotDeletion()" class="w-full flex items-center justify-between p-4 border border-red-200/50 rounded-2xl bg-red-50/25 hover:bg-red-50/60 text-red-600 transition-all active:scale-[0.99] transform duration-150 shadow-sm">
           <span class="text-sm font-semibold">Удалить проект</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
         </button>
@@ -399,7 +399,7 @@
 
   <!-- 2. RENAME MODAL -->
   <div id="modal-rename" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-rename')">
-    <div class="bg-milk rounded-[2rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+    <div class="bg-milk rounded-[2rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
       <h4 class="font-serif italic text-xl">Переименовать проект</h4>
       <input type="text" id="input-rename-bot" class="w-full bg-beige border border-borderbeige rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-softbrown text-graphite font-medium">
       <div class="flex gap-2 justify-end pt-2">
@@ -411,7 +411,7 @@
 
   <!-- 3. CLONE MODAL -->
   <div id="modal-clone" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-clone')">
-    <div class="bg-milk rounded-[2rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+    <div class="bg-milk rounded-[2rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
       <h4 class="font-serif italic text-xl">Клонировать проект</h4>
       <p class="text-xs text-graphite/50 leading-relaxed">Пожалуйста, укажите имя для копии бота:</p>
       <input type="text" id="input-clone-bot" class="w-full bg-beige border border-borderbeige rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-softbrown text-graphite font-medium font-semibold">
@@ -424,7 +424,7 @@
 
   <!-- 4. TARIFF LIMIT WARNING MODAL -->
   <div id="modal-warning" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-warning')">
-    <div class="bg-milk rounded-[2.5rem] p-8 max-w-sm w-full text-center space-y-5 shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+    <div class="bg-milk rounded-[2.5rem] p-8 max-w-sm w-full text-center space-y-5 shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
       <div class="w-12 h-12 bg-softbrown/15 rounded-full flex items-center justify-center mx-auto text-softbrown">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
       </div>
@@ -441,13 +441,13 @@
 
   <!-- 5. INTERACTIVE BOT EMULATOR OVERLAY -->
   <div id="modal-emulator" class="fixed inset-0 bg-graphite/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-emulator')">
-    <div class="bg-[#F5F1E9] rounded-[2.5rem] max-w-sm w-full h-[620px] flex flex-col justify-between overflow-hidden shadow-2xl border-borderbeige scale-95 transition-all duration-200">
-      <div class="bg-milk p-4 border-b border-borderbeige/80 flex items-center justify-between">
+    <div class="bg-[#F5F1E9] rounded-[2.5rem] max-w-sm w-full h-[620px] flex flex-col justify-between overflow-hidden shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
+      <div class="bg-milk p-4 border-b border-borderbeige/85 flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="h-9 w-9 rounded-full bg-softbrown/15 flex items-center justify-center text-softbrown font-bold text-xs">🤖</div>
           <div>
             <h5 id="emulator-header-bot-name" class="text-xs font-bold text-graphite flex items-center gap-1">Имя бота</h5>
-            <span class="text-[10px] text-green-600 block font-semibold">bot is online</span>
+            <span class="text-[10px] text-emerald-600 block font-semibold">bot is online</span>
           </div>
         </div>
         <button onclick="closeActiveModal('modal-emulator')" class="text-xs font-bold text-graphite/45 hover:text-graphite transition-all px-3 py-2 rounded-xl bg-beige active:scale-95">‹ Назад</button>
@@ -469,7 +469,7 @@
 
   <!-- 6. CODE GENERATOR OVERLAY -->
   <div id="modal-codeview" class="fixed inset-0 bg-graphite/45 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-codeview')">
-    <div class="bg-milk rounded-[2.5rem] max-w-lg w-full h-[640px] flex flex-col justify-between overflow-hidden shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+    <div class="bg-milk rounded-[2.5rem] max-w-lg w-full h-[640px] flex flex-col justify-between overflow-hidden shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
       <div class="p-6 border-b border-borderbeige/80 flex justify-between items-center bg-beige/35">
         <div>
           <h5 class="font-serif italic text-lg text-graphite">Сгенерированный aiogram 3.x код с FSM</h5>
@@ -491,7 +491,7 @@
 
   <!-- 7. LINK TO SCENARIOS DIALOG MODAL -->
   <div id="modal-link-scenario" class="fixed inset-0 bg-graphite/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-link-scenario')">
-    <div class="bg-milk rounded-[2.5rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border-borderbeige scale-95 transition-all duration-200">
+    <div class="bg-milk rounded-[2.5rem] p-6 max-w-sm w-full space-y-4 shadow-2xl border border-borderbeige scale-95 transition-all duration-200">
       <h4 class="font-serif italic text-xl">Связать кнопку со сценарием</h4>
       <p class="text-xs text-graphite/50 leading-relaxed">Выберите триггер-команду, которая сработает при нажатии этой кнопки:</p>
       <div id="link-scenario-options-container" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
@@ -501,26 +501,161 @@
     </div>
   </div>
 
+  <!-- 8. GENTLEMAN CONFIRM DELETE MODAL -->
+  <div id="modal-confirm-delete" class="fixed inset-0 bg-graphite/50 backdrop-blur-sm z-55 flex items-center justify-center p-4 hidden" onclick="closeModalOnOuterClick(event, 'modal-confirm-delete')">
+    <div class="bg-milk rounded-[2rem] p-8 max-w-sm w-full text-center space-y-6 shadow-2xl border border-softbrown/20 scale-95 transition-all duration-200" id="modal-confirm-delete-content">
+      <div class="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto border border-red-100">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+      </div>
+      <div class="space-y-2">
+        <h4 class="font-serif italic text-xl text-graphite">Вы уверены?</h4>
+        <p id="confirm-delete-text" class="text-xs text-graphite/55 leading-relaxed">Это действие необратимо. Элемент будет навсегда стерт из вашей системной архитектуры.</p>
+      </div>
+      <div class="flex flex-col gap-2 pt-1">
+        <button id="btn-confirm-delete-action" class="w-full bg-red-550 bg-red-600 hover:bg-red-700 text-milk text-xs font-semibold py-3.5 rounded-xl transition-all shadow-md active:scale-95">Да, безжалостно удалить</button>
+        <button onclick="closeActiveModal('modal-confirm-delete')" class="text-xs font-semibold text-graphite/45 py-2.5 hover:text-graphite transition-all">Отмена</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ================= STATE MANAGEMENT AND VANILLA JS LOGIC ================= -->
   <script>
+    // Инициализируем Supabase клиент v2
+    const SUPABASE_URL = 'https://xhbxfawzxkapfzramfej.supabase.co/';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoYnhmYXd6eGthcGZ6cmFtZmVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDUxNzUsImV4cCI6MjA5NzgyMTE3NX0.2UB5h-HiCUv48eGsxxYsQEUAcxaSN5WXYQ9PZ46iWEo';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Получаем telegram_id из WebApp.
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const telegramId = tgUser ? String(tgUser.id) : 'local_dev_user';
+
     let appState = {
       currentTab: 'bots',       
       animationsEnabled: true,
-      selectedPlan: 'pro',     // Настройки тарифа по умолчанию PRO для удобства тестирования
+      selectedPlan: 'pro',     
       bots: [],                 
       selectedBot: null,        
       activeBot: null,          
       linkingTargetScenarioId: null,
       linkingTargetButtonIndex: null,
-      linkingType: 'inline', // 'inline' or 'keyboard'
+      linkingType: 'inline', 
       emulatorMessages: [],
-      currentEmulatorReplyKeyboard: []
+      currentEmulatorReplyKeyboard: [],
+      deleteCallback: null
     };
 
     window.onload = function() {
-      renderBotsTab();
+      loadProjectsFromSupabase();
       updateNavigationUI();
+    };
+
+    // --- СИНХРОНИЗАЦИЯ С SUPABASE ---
+    async function saveProjectToSupabase(botObj) {
+      if (!botObj) return;
+      const statusBadge = document.getElementById('cloud-status-badge');
+      statusBadge.textContent = "Сохранение...";
+      statusBadge.className = "text-[9px] not-italic bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold";
+
+      try {
+        // Конфиг содержит массив сценариев бота
+        const botConfig = { scenarios: botObj.scenarios };
+
+        // Ищем проект с таким же bot_name у нашего юзера
+        const { data: existing, error: searchError } = await supabaseClient
+            .from('projects')
+            .select('id')
+            .eq('user_id', telegramId)
+            .eq('bot_name', botObj.name)
+            .maybeSingle();
+
+        if (existing) {
+            // Обновляем существующий
+            const { error } = await supabaseClient
+                .from('projects')
+                .update({ config: botConfig })
+                .eq('id', existing.id);
+            if (error) throw error;
+        } else {
+            // Создаем новый
+            const { error } = await supabaseClient
+                .from('projects')
+                .insert([{ user_id: telegramId, bot_name: botObj.name, config: botConfig }]);
+            if (error) throw error;
+        }
+
+        statusBadge.textContent = "Облако активно";
+        statusBadge.className = "text-[9px] not-italic bg-emerald-50 text-emerald-700 border border-emerald-150 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold";
+      } catch (err) {
+        console.error('Ошибка Supabase при сохранении:', err.message);
+        statusBadge.textContent = "Ошибка облака";
+        statusBadge.className = "text-[9px] not-italic bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold";
+      }
+    }
+
+    async function loadProjectsFromSupabase() {
+      const statusBadge = document.getElementById('cloud-status-badge');
+      statusBadge.textContent = "Синхронизация...";
+
+      try {
+        const { data, error } = await supabaseClient
+            .from('projects')
+            .select('id, bot_name, config')
+            .eq('user_id', telegramId);
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+            appState.bots = data.map(item => {
+              return {
+                id: 'bot_' + item.id,
+                name: item.bot_name,
+                scenarios: item.config?.scenarios || []
+              };
+            });
+            console.log('Данные успешно загружены из Supabase!', appState.bots);
+        } else {
+            appState.bots = [];
+        }
+        renderBotsTab();
+        statusBadge.textContent = "Облако активно";
+        statusBadge.className = "text-[9px] not-italic bg-emerald-50 text-emerald-700 border border-emerald-150 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold";
+      } catch (err) {
+        console.error('Ошибка Supabase при загрузке:', err.message);
+        statusBadge.textContent = "Ошибка облака";
+        statusBadge.className = "text-[9px] not-italic bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold";
+        // При ошибке облака используем пустой стейт
+        appState.bots = [];
+        renderBotsTab();
+      }
+    }
+
+    async function deleteProjectFromSupabase(botName) {
+      try {
+        const { error } = await supabaseClient
+          .from('projects')
+          .delete()
+          .eq('user_id', telegramId)
+          .eq('bot_name', botName);
+        if (error) throw error;
+        console.log(`Проект "${botName}" успешно удален из Supabase`);
+      } catch (err) {
+        console.error('Ошибка Supabase при удалении проекта:', err.message);
+      }
+    }
+
+    // --- УМНОЕ ПОДТВЕРЖДЕНИЕ УДАЛЕНИЯ (Confirm Modal) ---
+    function openConfirmDeleteModal(textMessage, onConfirmCallback) {
+      document.getElementById('confirm-delete-text').textContent = textMessage;
+      appState.deleteCallback = onConfirmCallback;
+      openModal('modal-confirm-delete');
+    }
+
+    document.getElementById('btn-confirm-delete-action').onclick = function() {
+      if (typeof appState.deleteCallback === 'function') {
+        appState.deleteCallback();
+      }
+      closeActiveModal('modal-confirm-delete');
+      appState.deleteCallback = null;
     };
 
     function switchTab(tabName) {
@@ -545,7 +680,6 @@
       }
     }
 
-    // Поддерживает класс 'w-full h-full' для идеальной центровки в парящем Grid-контейнере
     function updateNavigationUI() {
       const tabs = ['bots', 'create', 'profile'];
       tabs.forEach(t => {
@@ -564,6 +698,8 @@
         const index = appState.bots.findIndex(b => b.id === appState.activeBot.id);
         if (index !== -1) {
           appState.bots[index] = JSON.parse(JSON.stringify(appState.activeBot));
+          // Сохраняем в Supabase при выходе из редактора
+          saveProjectToSupabase(appState.bots[index]);
         }
       }
       appState.activeBot = null;
@@ -599,10 +735,8 @@
           badge.classList.add('hidden');
         }
       });
-      document.getElementById('header-plan-badge').textContent = plan.toUpperCase();
     }
 
-    // --- Умный рендеринг таба ботов (без переигрывания анимации существующих карточек) ---
     function renderBotsTab() {
       const countBadge = document.getElementById('bots-count-badge');
       const emptyState = document.getElementById('bots-empty-state');
@@ -616,7 +750,6 @@
         emptyState.classList.add('hidden');
         listContainer.classList.remove('hidden');
 
-        // 1. Удаляем из DOM карточки тех ботов, которых больше нет в стейте
         const activeIds = appState.bots.map(b => 'bot-card-' + b.id);
         Array.from(listContainer.children).forEach(card => {
           if (!activeIds.includes(card.id)) {
@@ -624,7 +757,6 @@
           }
         });
 
-        // 2. Создаем новые карточки (с анимацией) или обновляем старые (без сброса анимации)
         appState.bots.forEach(bot => {
           const cardId = 'bot-card-' + bot.id;
           let card = document.getElementById(cardId);
@@ -633,24 +765,22 @@
           if (isNew) {
             card = document.createElement('div');
             card.id = cardId;
-            // Анимацию запускаем ТОЛЬКО если карточка абсолютно новая
-            card.className = "p-5 border border-borderbeige rounded-2xl bg-milk hover:bg-beige/30 transition-all cursor-pointer relative group shadow-premium animate-tab";
+            card.className = "p-5 border border-borderbeige rounded-2xl bg-milk hover:bg-beige/10 transition-all cursor-pointer relative group shadow-premium animate-tab";
             listContainer.appendChild(card);
           } else {
-            // Старую карточку оставляем стабильной
-            card.className = "p-5 border border-borderbeige rounded-2xl bg-milk hover:bg-beige/30 transition-all cursor-pointer relative group shadow-premium";
+            card.className = "p-5 border border-borderbeige rounded-2xl bg-milk hover:bg-beige/10 transition-all cursor-pointer relative group shadow-premium";
           }
 
           card.onclick = () => openBotContext(bot.id);
           card.innerHTML = `
             <div class="flex justify-between items-start gap-4">
               <div class="space-y-1">
-                <h3 class="font-semibold text-base text-graphite tracking-tight">${escapeHTML(bot.name)}</h3>
-                <p class="text-xs text-graphite/40 mt-1 flex items-center gap-1.5 font-medium">
-                  Изменен: <span>15.02.2026</span>
+                <h3 class="font-semibold text-base text-graphite tracking-tight font-serif italic">${escapeHTML(bot.name)}</h3>
+                <p class="text-[10px] text-graphite/40 mt-1 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+                  Облачное сохранение настроено
                 </p>
               </div>
-              <div class="h-8 w-8 shrink-0 rounded-full bg-beige flex items-center justify-center text-softbrown group-hover:bg-softbrown group-hover:text-milk transition-all">➔</div>
+              <div class="h-8 w-8 shrink-0 rounded-full bg-beige/80 border border-borderbeige flex items-center justify-center text-softbrown group-hover:bg-softbrown group-hover:text-milk group-hover:border-transparent transition-all">➔</div>
             </div>
             <div class="flex gap-2 mt-4 flex-wrap">
               <span class="text-[10px] bg-beige text-softbrown px-2.5 py-1 rounded font-semibold border border-borderbeige/40">${bot.scenarios.length} сценариев</span>
@@ -660,16 +790,23 @@
       }
     }
 
-    function createNewBot() {
+    async function createNewBot() {
       const input = document.getElementById('input-new-bot-name');
       const name = input.value.trim();
       if (!name) return;
-      appState.bots.push({
+      
+      const newBot = {
         id: 'bot_' + Date.now(),
         name: name,
         scenarios: []
-      });
+      };
+
+      appState.bots.push(newBot);
       input.value = '';
+      
+      // Сразу сохраняем структуру нового бота в Supabase
+      await saveProjectToSupabase(newBot);
+
       switchTab('bots');
     }
 
@@ -725,12 +862,16 @@
       openModal('modal-rename');
     }
 
-    function confirmRename() {
+    async function confirmRename() {
       const newName = document.getElementById('input-rename-bot').value.trim();
       if (!newName) return;
       const idx = appState.bots.findIndex(b => b.id === appState.selectedBot.id);
       if (idx !== -1) {
+        const oldName = appState.bots[idx].name;
         appState.bots[idx].name = newName;
+        // Переименовываем в БД: удаляем старый, сохраняем новый
+        await deleteProjectFromSupabase(oldName);
+        await saveProjectToSupabase(appState.bots[idx]);
       }
       closeActiveModal('modal-rename');
       renderBotsTab();
@@ -742,22 +883,28 @@
       openModal('modal-clone');
     }
 
-    function confirmClone() {
+    async function confirmClone() {
       const cloneName = document.getElementById('input-clone-bot').value.trim();
       if (!cloneName) return;
       const base = appState.selectedBot;
       const clone = JSON.parse(JSON.stringify(base));
       clone.id = 'bot_' + Date.now();
       clone.name = cloneName;
+      
       appState.bots.push(clone);
+      await saveProjectToSupabase(clone);
+
       closeActiveModal('modal-clone');
       renderBotsTab();
     }
 
-    function deleteSelectedBot() {
-      appState.bots = appState.bots.filter(b => b.id !== appState.selectedBot.id);
+    function triggerSelectedBotDeletion() {
       closeActiveModal('modal-context');
-      renderBotsTab();
+      openConfirmDeleteModal(`Вы действительно хотите безвозвратно удалить проект "${appState.selectedBot.name}" из облака?`, async () => {
+        await deleteProjectFromSupabase(appState.selectedBot.name);
+        appState.bots = appState.bots.filter(b => b.id !== appState.selectedBot.id);
+        renderBotsTab();
+      });
     }
 
     function editActiveBot() {
@@ -768,7 +915,7 @@
       switchTab('editor');
     }
 
-    // --- Умный рендеринг сценариев (DOM Retention / Сохранение DOM-узлов) ---
+    // --- ДЖЕНТЕЛЬМЕНСКИЙ ДИЗАЙН СЦЕНАРИЕВ С ВЫСОКИМ ЮЗАБИЛИТИ ---
     function renderEditorScenarios() {
       const container = document.getElementById('scenarios-list-container');
       const empty = document.getElementById('scenarios-empty-state');
@@ -779,7 +926,6 @@
       }
       empty.classList.add('hidden');
 
-      // 1. Синхронизируем DOM: Удаляем те карточки, которые были удалены из стейта
       const activeIds = appState.activeBot.scenarios.map(s => 'scen-card-' + s.id);
       Array.from(container.children).forEach(card => {
         if (!activeIds.includes(card.id)) {
@@ -787,116 +933,110 @@
         }
       });
 
-      // 2. Отрисовываем или интеллектуально обновляем существующие карточки
       appState.activeBot.scenarios.forEach((scen) => {
         const cardId = 'scen-card-' + scen.id;
         let card = document.getElementById(cardId);
         const isNew = !card;
 
-        // Если карточка новая — создаем элемент и вешаем анимацию ПОЯВЛЕНИЯ
         if (isNew) {
           card = document.createElement('div');
           card.id = cardId;
-          card.className = "p-6 border border-borderbeige rounded-3xl bg-milk shadow-premium space-y-5 relative animate-tab";
+          card.className = "p-6 border border-borderbeige rounded-3xl bg-milk shadow-premium space-y-6 relative animate-tab";
           container.appendChild(card);
         } else {
-          // Если карточка уже была на экране — сохраняем её класс стабильным, БЕЗ анимации
-          card.className = "p-6 border border-borderbeige rounded-3xl bg-milk shadow-premium space-y-5 relative";
+          card.className = "p-6 border border-borderbeige rounded-3xl bg-milk shadow-premium space-y-6 relative";
         }
 
-        // Вычисляем, изменилась ли видимость внутренних блоков для точечной микро-анимации под-блоков
         const wasKeyboardVisible = card.querySelector('.keyboard-box') && !card.querySelector('.keyboard-box').classList.contains('hidden');
         const wasAlertVisible = card.querySelector('.alert-box') && !card.querySelector('.alert-box').classList.contains('hidden');
         const wasInlineVisible = card.querySelector('.inline-box') && !card.querySelector('.inline-box').classList.contains('hidden');
         const wasButtonsVisible = card.querySelector('.buttons-box') && !card.querySelector('.buttons-box').classList.contains('hidden');
 
-        // Микро-анимация применяется ТОЛЬКО если блок переходит из скрытого в видимое состояние!
         const keyboardAnimClass = (scen.hasKeyboard && !wasKeyboardVisible) ? 'animate-pop' : '';
         const alertAnimClass = (scen.hasAlert && !wasAlertVisible) ? 'animate-pop' : '';
         const inlineAnimClass = (scen.hasInlineNotif && !wasInlineVisible) ? 'animate-pop' : '';
         const buttonsAnimClass = (scen.hasButtons && !wasButtonsVisible) ? 'animate-pop' : '';
 
-        // Перерисовываем содержимое (без сброса общего DOM-контейнера карточки)
         card.innerHTML = `
           <!-- Delete button -->
-          <button onclick="deleteScenario('${scen.id}')" class="absolute top-5 right-5 text-graphite/30 hover:text-red-500 transition-all text-xs p-1 rounded-lg hover:bg-beige/40">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+          <button onclick="confirmDeleteScenario('${scen.id}')" class="absolute top-5 right-5 text-graphite/30 hover:text-red-500 transition-all text-xs p-1.5 rounded-lg hover:bg-beige/40">
+            <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:18px;height:18px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
           </button>
 
           <!-- Header с чекбоксом "Уникальный" -->
-          <div class="flex justify-between items-center max-w-[82%] pb-2 border-b border-borderbeige/40">
+          <div class="flex justify-between items-center max-w-[82%] pb-2 border-b border-borderbeige/60">
             <div class="space-y-0.5">
-              <span class="text-[10px] font-bold text-graphite/45 uppercase tracking-wider">Тип Сценария</span>
+              <span class="text-[9px] font-bold text-softbrown uppercase tracking-wider font-serif italic">Настройки шага</span>
             </div>
-            <label class="flex items-center gap-2 cursor-pointer bg-beige/40 border border-borderbeige px-2.5 py-1 rounded-lg">
+            <label class="flex items-center gap-2 cursor-pointer bg-beige/30 border border-borderbeige/80 px-3 py-1 rounded-xl">
               <input type="checkbox" ${scen.isUnique ? 'checked' : ''} onchange="toggleUniqueScenario('${scen.id}')" class="rounded border-borderbeige text-softbrown focus:ring-softbrown/40 h-3.5 w-3.5">
-              <span class="text-[10px] font-bold text-graphite/80 tracking-wide">Уникальный скрытый</span>
+              <span class="text-[9px] font-bold text-graphite/70 tracking-wide font-medium">Скрытый (вызов кнопкой)</span>
             </label>
           </div>
 
           <!-- Trigger command field -->
           <div class="space-y-2 max-w-[82%]">
-            <label class="text-[10px] font-bold text-graphite/50 tracking-widest uppercase">Триггер-команда</label>
+            <label class="text-[9px] font-bold text-graphite/45 uppercase tracking-wider font-medium">Триггер-команда (без косой черты)</label>
             <div class="relative">
-              <span class="absolute left-4 top-3 text-sm text-graphite/45 font-medium">/</span>
-              <input type="text" value="${escapeHTML(scen.command)}" oninput="updateScenarioField('${scen.id}', 'command', this.value)" placeholder="например, start" class="w-full bg-beige border border-borderbeige rounded-xl pl-7 pr-4 py-3 text-xs font-mono focus:outline-none focus:border-softbrown text-graphite transition-all shadow-inner-soft">
+              <span class="absolute left-4 top-3 text-sm text-softbrown font-serif italic">/</span>
+              <input type="text" value="${escapeHTML(scen.command)}" oninput="updateScenarioField('${scen.id}', 'command', this.value)" placeholder="например, start" class="w-full bg-beige/40 border border-borderbeige rounded-xl pl-8 pr-4 py-3 text-xs font-mono focus:outline-none focus:border-softbrown focus:bg-beige/10 transition-all shadow-inner-soft font-semibold text-graphite">
             </div>
           </div>
 
           <!-- Response text -->
           <div class="space-y-2">
-            <label class="text-[10px] font-bold text-graphite/50 tracking-widest uppercase">Ответный Текст</label>
-            <textarea oninput="updateScenarioField('${scen.id}', 'responseText', this.value)" placeholder="Сообщение бота..." rows="2" class="w-full bg-beige border border-borderbeige rounded-xl px-4 py-3.5 text-xs focus:outline-none focus:border-softbrown text-graphite placeholder-graphite/30 transition-all shadow-inner-soft leading-relaxed">${escapeHTML(scen.responseText)}</textarea>
+            <label class="text-[9px] font-bold text-graphite/45 uppercase tracking-wider font-medium">Ответный Текст бота</label>
+            <textarea oninput="updateScenarioField('${scen.id}', 'responseText', this.value)" placeholder="Текст сообщения..." rows="2" class="w-full bg-beige/40 border border-borderbeige rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-softbrown focus:bg-beige/10 text-graphite placeholder-graphite/30 transition-all shadow-inner-soft leading-relaxed font-medium">${escapeHTML(scen.responseText)}</textarea>
           </div>
 
           <!-- Component Checkboxes -->
           <div class="space-y-3 pt-1">
-            <label class="text-[10px] font-bold text-graphite/50 tracking-widest uppercase">Комплектующие сценария</label>
+            <label class="text-[9px] font-bold text-graphite/45 uppercase tracking-wider font-medium">Комплектующие сценария</label>
             <div class="grid grid-cols-2 gap-3">
-              <label class="flex items-center gap-3 p-3 border border-borderbeige/60 bg-beige/30 rounded-xl cursor-pointer hover:bg-beige/60 transition-all">
+              <label class="flex items-center gap-3 p-3 border border-borderbeige/70 bg-beige/20 rounded-xl cursor-pointer hover:bg-beige/40 transition-all">
                 <input type="checkbox" ${scen.hasKeyboard ? 'checked' : ''} onchange="toggleComponent('${scen.id}', 'hasKeyboard')" class="rounded border-borderbeige text-softbrown h-4 w-4">
-                <span class="text-xs text-graphite/85 font-medium">Клавиатура</span>
+                <span class="text-xs text-graphite/80 font-medium">Экранная (Reply)</span>
               </label>
-              <label class="flex items-center gap-3 p-3 border border-borderbeige/60 bg-beige/30 rounded-xl cursor-pointer hover:bg-beige/60 transition-all">
+              <label class="flex items-center gap-3 p-3 border border-borderbeige/70 bg-beige/20 rounded-xl cursor-pointer hover:bg-beige/40 transition-all">
                 <input type="checkbox" ${scen.hasAlert ? 'checked' : ''} onchange="toggleComponent('${scen.id}', 'hasAlert')" class="rounded border-borderbeige text-softbrown h-4 w-4">
-                <span class="text-xs text-graphite/85 font-medium">Алерты</span>
+                <span class="text-xs text-graphite/80 font-medium">Алерты (с OK)</span>
               </label>
-              <label class="flex items-center gap-3 p-3 border border-borderbeige/60 bg-beige/30 rounded-xl cursor-pointer hover:bg-beige/60 transition-all">
+              <label class="flex items-center gap-3 p-3 border border-borderbeige/70 bg-beige/20 rounded-xl cursor-pointer hover:bg-beige/40 transition-all">
                 <input type="checkbox" ${scen.hasInlineNotif ? 'checked' : ''} onchange="toggleComponent('${scen.id}', 'hasInlineNotif')" class="rounded border-borderbeige text-softbrown h-4 w-4">
-                <span class="text-xs text-graphite/85 font-medium">Инлайн увед-ия</span>
+                <span class="text-xs text-graphite/80 font-medium">Уведомления (тосты)</span>
               </label>
-              <label class="flex items-center gap-3 p-3 border border-borderbeige/60 bg-beige/30 rounded-xl cursor-pointer hover:bg-beige/60 transition-all">
+              <label class="flex items-center gap-3 p-3 border border-borderbeige/70 bg-beige/20 rounded-xl cursor-pointer hover:bg-beige/40 transition-all">
                 <input type="checkbox" ${scen.hasButtons ? 'checked' : ''} onchange="toggleComponent('${scen.id}', 'hasButtons')" class="rounded border-borderbeige text-softbrown h-4 w-4">
-                <span class="text-xs text-graphite/85 font-medium">Кнопки</span>
+                <span class="text-xs text-graphite/80 font-medium">Встроенные (Inline)</span>
               </label>
             </div>
           </div>
 
-          <!-- DYNAMIC SUB-VIEWS (С независимой покадровой анимацией появления) -->
+          <!-- DYNAMIC SUB-VIEWS (Умные плашки настройки компонентов) -->
           <div class="space-y-4 pt-1">
             
             <!-- REPLY KEYBOARD BOX -->
-            <div class="keyboard-box p-4 border border-borderbeige rounded-2xl bg-beige/20 space-y-3 ${scen.hasKeyboard ? keyboardAnimClass : 'hidden'}">
+            <div class="keyboard-box p-4 border border-borderbeige rounded-2xl bg-beige/25 space-y-3 ${scen.hasKeyboard ? keyboardAnimClass : 'hidden'}">
               <div class="flex justify-between items-center gap-2">
-                <span class="text-xs font-bold text-softbrown uppercase tracking-wider">Reply-Клавиатура</span>
-                <button onclick="addKeyboardButton('${scen.id}')" class="text-[11px] bg-softbrown text-milk px-3 py-1.5 rounded-lg font-semibold shadow-sm">
-                  + Кнопка
+                <span class="text-[10px] font-bold text-softbrown uppercase tracking-wider font-serif">Reply-Экранное Меню</span>
+                <button onclick="addKeyboardButton('${scen.id}')" class="text-[10px] bg-softbrown text-milk px-3 py-1.5 rounded-lg font-bold shadow-sm active:scale-95 transition-all">
+                  + Добавить кнопку
                 </button>
               </div>
               <div class="space-y-3">
                 ${scen.keyboardButtons.map((btn, bIdx) => `
-                  <div class="p-3 border border-borderbeige/60 bg-milk rounded-xl flex flex-col gap-2 relative shadow-sm">
-                    <button onclick="removeKeyboardButton('${scen.id}', ${bIdx})" class="absolute top-2 right-2.5 text-graphite/40 hover:text-red-500 font-semibold text-xs p-1">Удалить</button>
+                  <div class="p-3.5 border border-borderbeige/80 bg-milk rounded-xl flex flex-col gap-2.5 relative shadow-sm">
+                    <button onclick="confirmRemoveKeyboardButton('${scen.id}', ${bIdx})" class="absolute top-2 right-2.5 text-graphite/40 hover:text-red-500 font-bold text-[10px]">Удалить</button>
                     <div class="space-y-1">
-                      <label class="text-[8px] text-graphite/45 uppercase font-bold tracking-wider">Текст на кнопке</label>
-                      <input type="text" value="${escapeHTML(btn.text)}" oninput="updateKeyboardButtonField('${scen.id}', ${bIdx}, 'text', this.value)" class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-1.5 text-xs font-semibold">
+                      <label class="text-[8px] text-graphite/40 uppercase font-bold tracking-wider">Текст на кнопке</label>
+                      <input type="text" value="${escapeHTML(btn.text)}" oninput="updateKeyboardButtonField('${scen.id}', ${bIdx}, 'text', this.value)" class="w-full bg-beige/35 border border-borderbeige rounded-lg px-3 py-1.5 text-xs font-semibold text-graphite">
                     </div>
-                    <div class="space-y-2">
+                    <div class="space-y-1.5">
                       <div class="flex justify-between items-center">
-                        <label class="text-[8px] text-graphite/45 uppercase font-bold tracking-wider">Действие при клике</label>
-                        <button onclick="openScenarioLinkForComponent('${scen.id}', ${bIdx}, 'keyboard')" class="text-[9px] text-softbrown hover:underline font-bold">Связать сценарий</button>
+                        <label class="text-[8px] text-graphite/40 uppercase font-bold tracking-wider">Связать со сценарием</label>
+                        <button onclick="openScenarioLinkForComponent('${scen.id}', ${bIdx}, 'keyboard')" class="text-[9px] text-softbrown hover:underline font-bold">Выбрать триггер ›</button>
                       </div>
-                      <input type="text" value="${escapeHTML(btn.actionValue)}" oninput="updateKeyboardButtonField('${scen.id}', ${bIdx}, 'actionValue', this.value)" placeholder="Текст ответа или имя команды..." class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-1.5 text-xs focus:outline-none font-medium">
+                      <input type="text" value="${escapeHTML(btn.actionValue)}" oninput="updateKeyboardButtonField('${scen.id}', ${bIdx}, 'actionValue', this.value)" placeholder="Например, /about" class="w-full bg-beige/35 border border-borderbeige rounded-lg px-3 py-1.5 text-xs font-mono focus:outline-none">
                     </div>
                   </div>
                 `).join('')}
@@ -904,57 +1044,57 @@
             </div>
 
             <!-- ALERTS BOX -->
-            <div class="alert-box p-4 border border-borderbeige rounded-2xl bg-beige/20 space-y-2 ${scen.hasAlert ? alertAnimClass : 'hidden'}">
-              <span class="text-xs font-bold text-softbrown uppercase tracking-wider block">Всплывающий Алерт (с кнопкой OK)</span>
-              <input type="text" value="${escapeHTML(scen.alertText)}" oninput="updateScenarioField('${scen.id}', 'alertText', this.value)" placeholder="Сообщение..." class="w-full bg-milk border border-borderbeige rounded-xl px-3.5 py-2.5 text-xs font-medium focus:border-softbrown">
+            <div class="alert-box p-4 border border-borderbeige rounded-2xl bg-beige/25 space-y-2 ${scen.hasAlert ? alertAnimClass : 'hidden'}">
+              <span class="text-[10px] font-bold text-softbrown uppercase tracking-wider block font-serif">Всплывающее окно (Алерт с OK)</span>
+              <input type="text" value="${escapeHTML(scen.alertText)}" oninput="updateScenarioField('${scen.id}', 'alertText', this.value)" placeholder="Сообщение в окне..." class="w-full bg-milk border border-borderbeige rounded-xl px-3.5 py-2.5 text-xs font-medium focus:border-softbrown focus:outline-none">
             </div>
 
             <!-- INLINE NOTIFICATION BOX -->
-            <div class="inline-box p-4 border border-borderbeige rounded-2xl bg-beige/20 space-y-2 ${scen.hasInlineNotif ? inlineAnimClass : 'hidden'}">
-              <span class="text-xs font-bold text-softbrown uppercase tracking-wider block">Инлайн уведомление (без OK)</span>
-              <input type="text" value="${escapeHTML(scen.inlineNotifText)}" oninput="updateScenarioField('${scen.id}', 'inlineNotifText', this.value)" placeholder="Сообщение..." class="w-full bg-milk border border-borderbeige rounded-xl px-3.5 py-2.5 text-xs font-medium focus:border-softbrown">
+            <div class="inline-box p-4 border border-borderbeige rounded-2xl bg-beige/25 space-y-2 ${scen.hasInlineNotif ? inlineAnimClass : 'hidden'}">
+              <span class="text-[10px] font-bold text-softbrown uppercase tracking-wider block font-serif">Уведомление (Тост вверху экрана)</span>
+              <input type="text" value="${escapeHTML(scen.inlineNotifText)}" oninput="updateScenarioField('${scen.id}', 'inlineNotifText', this.value)" placeholder="Всплывающее уведомление..." class="w-full bg-milk border border-borderbeige rounded-xl px-3.5 py-2.5 text-xs font-medium focus:border-softbrown focus:outline-none">
             </div>
 
             <!-- INLINE BUTTONS BOX -->
-            <div class="buttons-box p-4 border border-borderbeige rounded-2xl bg-beige/20 space-y-3 ${scen.hasButtons ? buttonsAnimClass : 'hidden'}">
+            <div class="buttons-box p-4 border border-borderbeige rounded-2xl bg-beige/25 space-y-3 ${scen.hasButtons ? buttonsAnimClass : 'hidden'}">
               <div class="flex justify-between items-center gap-2">
-                <span class="text-xs font-bold text-softbrown uppercase tracking-wider">Инлайн Кнопки под сообщением</span>
-                <button onclick="addInlineButton('${scen.id}')" class="text-[11px] bg-softbrown text-milk px-3 py-1.5 rounded-lg font-semibold shadow-sm">
-                  + Инлайн кнопка
+                <span class="text-[10px] font-bold text-softbrown uppercase tracking-wider font-serif">Inline-кнопки под сообщением</span>
+                <button onclick="addInlineButton('${scen.id}')" class="text-[10px] bg-softbrown text-milk px-3 py-1.5 rounded-lg font-bold shadow-sm active:scale-95 transition-all">
+                  + Добавить кнопку
                 </button>
               </div>
               <div class="space-y-3">
                 ${scen.inlineButtons.map((ibtn, ibIdx) => `
-                  <div class="p-4 border border-borderbeige rounded-2xl bg-milk flex flex-col gap-3 relative shadow-sm">
-                    <button onclick="removeInlineButton('${scen.id}', ${ibIdx})" class="absolute top-3 bottom-3 right-3 text-graphite/40 hover:text-red-500 text-xs font-semibold p-1">Удалить</button>
+                  <div class="p-4 border border-borderbeige rounded-xl bg-milk flex flex-col gap-3 relative shadow-sm">
+                    <button onclick="confirmRemoveInlineButton('${scen.id}', ${ibIdx})" class="absolute top-3 right-3 text-graphite/40 hover:text-red-500 text-xs font-bold">Удалить</button>
                     <div class="grid grid-cols-2 gap-3">
                       <div class="space-y-1">
-                        <label class="text-[9px] text-graphite/45 uppercase font-bold tracking-wider">Текст кнопки</label>
-                        <input type="text" value="${escapeHTML(ibtn.text)}" oninput="updateInlineButtonField('${scen.id}', ${ibIdx}, 'text', this.value)" placeholder="Кнопка" class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-2 text-xs font-medium">
+                        <label class="text-[8px] text-graphite/40 uppercase font-bold tracking-wider">Название кнопки</label>
+                        <input type="text" value="${escapeHTML(ibtn.text)}" oninput="updateInlineButtonField('${scen.id}', ${ibIdx}, 'text', this.value)" class="w-full bg-beige/35 border border-borderbeige rounded-lg px-3 py-1.5 text-xs font-semibold text-graphite">
                       </div>
                       <div class="space-y-1">
-                        <label class="text-[9px] text-graphite/45 uppercase font-bold tracking-wider">Тип действия</label>
-                        <select onchange="updateInlineButtonField('${scen.id}', ${ibIdx}, 'actionType', this.value)" class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-2 text-xs font-medium focus:outline-none">
-                          <option value="text" ${ibtn.actionType === 'text' ? 'selected' : ''}>Текст</option>
-                          <option value="alert" ${ibtn.actionType === 'alert' ? 'selected' : ''}>Алерт</option>
+                        <label class="text-[8px] text-graphite/40 uppercase font-bold tracking-wider">Тип клика</label>
+                        <select onchange="updateInlineButtonField('${scen.id}', ${ibIdx}, 'actionType', this.value)" class="w-full bg-beige/35 border border-borderbeige rounded-lg px-3 py-1.5 text-xs font-medium focus:outline-none">
+                          <option value="text" ${ibtn.actionType === 'text' ? 'selected' : ''}>Ответ текстом</option>
+                          <option value="alert" ${ibtn.actionType === 'alert' ? 'selected' : ''}>Показать алерт</option>
                         </select>
                       </div>
                     </div>
                     <div class="space-y-2">
                       <div class="flex justify-between items-center">
-                        <label class="text-[9px] text-graphite/45 uppercase font-bold tracking-wider">Значение действия</label>
-                        <button onclick="openScenarioLinkForComponent('${scen.id}', ${ibIdx}, 'inline')" class="text-[10px] text-softbrown hover:underline font-semibold flex items-center gap-1">
-                          Связать сценарий <span class="text-[8px] bg-softbrown/10 text-softbrown px-1 rounded font-extrabold">PRO</span>
+                        <label class="text-[8px] text-graphite/40 uppercase font-bold tracking-wider">Значение действия при клике</label>
+                        <button onclick="openScenarioLinkForComponent('${scen.id}', ${ibIdx}, 'inline')" class="text-[9px] text-softbrown hover:underline font-bold flex items-center gap-0.5">
+                          Связать сценарий <span class="text-[7px] bg-softbrown/10 text-softbrown px-1 rounded font-extrabold uppercase font-sans">PRO</span>
                         </button>
                       </div>
-                      <input type="text" value="${escapeHTML(ibtn.actionValue)}" oninput="updateInlineButtonField('${scen.id}', ${ibIdx}, 'actionValue', this.value)" placeholder="Ответ..." class="w-full bg-beige/50 border border-borderbeige/80 rounded-xl px-3 py-2 text-xs font-medium">
+                      <input type="text" value="${escapeHTML(ibtn.actionValue)}" oninput="updateInlineButtonField('${scen.id}', ${ibIdx}, 'actionValue', this.value)" placeholder="Например, Привет!" class="w-full bg-beige/35 border border-borderbeige rounded-lg px-3 py-2 text-xs font-medium">
                     </div>
                     ${(ibtn.linkedScenarios && ibtn.linkedScenarios.length > 0) ? `
                       <div class="flex gap-1.5 flex-wrap mt-1">
                         ${ibtn.linkedScenarios.map(lnk => `
-                          <span class="text-[9px] bg-beige text-graphite/70 border border-borderbeige px-2 py-0.5 rounded-lg flex items-center gap-1 font-semibold animate-pop">
+                          <span class="text-[9px] bg-beige text-graphite/70 border border-borderbeige px-2.5 py-1 rounded-lg flex items-center gap-1 font-semibold animate-pop">
                             <span>/${escapeHTML(lnk)}</span>
-                            <button onclick="unlinkScenario('${scen.id}', ${ibIdx}, '${escapeHTML(lnk)}')" class="text-red-500 font-bold hover:text-red-700 ml-0.5">×</button>
+                            <button onclick="unlinkScenario('${scen.id}', ${ibIdx}, '${escapeHTML(lnk)}')" class="text-red-500 font-bold hover:text-red-700 ml-0.5 text-sm leading-none">&times;</button>
                           </span>
                         `).join('')}
                       </div>
@@ -983,18 +1123,35 @@
         hasButtons: false,
         inlineButtons: []
       });
+      // Синхронизируем и рендерим
+      syncActiveBotWithState();
       renderEditorScenarios();
     }
 
-    function deleteScenario(scenId) {
-      appState.activeBot.scenarios = appState.activeBot.scenarios.filter(s => s.id !== scenId);
-      renderEditorScenarios();
+    function syncActiveBotWithState() {
+      if (!appState.activeBot) return;
+      const index = appState.bots.findIndex(b => b.id === appState.activeBot.id);
+      if (index !== -1) {
+        appState.bots[index] = JSON.parse(JSON.stringify(appState.activeBot));
+        saveProjectToSupabase(appState.bots[index]);
+      }
+    }
+
+    function confirmDeleteScenario(scenId) {
+      const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
+      const commandName = scen ? scen.command : 'сценарий';
+      openConfirmDeleteModal(`Вы действительно хотите удалить сценарий "/${commandName}"? Все связанные кнопки потеряют связь.`, () => {
+        appState.activeBot.scenarios = appState.activeBot.scenarios.filter(s => s.id !== scenId);
+        syncActiveBotWithState();
+        renderEditorScenarios();
+      });
     }
 
     function updateScenarioField(scenId, field, value) {
       const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
       if (scen) {
         scen[field] = value;
+        syncActiveBotWithState();
       }
     }
 
@@ -1002,6 +1159,7 @@
       const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
       if (scen) {
         scen.isUnique = !scen.isUnique;
+        syncActiveBotWithState();
         renderEditorScenarios();
       }
     }
@@ -1036,6 +1194,7 @@
         scen.inlineButtons = [{ text: 'Перейти', actionType: 'text', actionValue: 'Вы нажали инлайн кнопку!', linkedScenarios: [] }];
       }
 
+      syncActiveBotWithState();
       renderEditorScenarios();
     }
 
@@ -1051,6 +1210,7 @@
           text: 'Кнопка ' + (scen.keyboardButtons.length + 1),
           actionValue: 'Действие'
         });
+        syncActiveBotWithState();
         renderEditorScenarios();
       }
     }
@@ -1059,15 +1219,18 @@
       const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
       if (scen && scen.keyboardButtons[idx]) {
         scen.keyboardButtons[idx][field] = value;
+        syncActiveBotWithState();
       }
     }
 
-    function removeKeyboardButton(scenId, idx) {
+    function confirmRemoveKeyboardButton(scenId, idx) {
       const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
-      if (scen) {
+      const btnText = scen && scen.keyboardButtons[idx] ? scen.keyboardButtons[idx].text : 'кнопку';
+      openConfirmDeleteModal(`Вы действительно хотите удалить кнопку "${btnText}"?`, () => {
         scen.keyboardButtons.splice(idx, 1);
+        syncActiveBotWithState();
         renderEditorScenarios();
-      }
+      });
     }
 
     function addInlineButton(scenId) {
@@ -1079,6 +1242,7 @@
           actionValue: 'Вы нажали кнопку!',
           linkedScenarios: []
         });
+        syncActiveBotWithState();
         renderEditorScenarios();
       }
     }
@@ -1087,15 +1251,18 @@
       const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
       if (scen && scen.inlineButtons[bIdx]) {
         scen.inlineButtons[bIdx][field] = value;
+        syncActiveBotWithState();
       }
     }
 
-    function removeInlineButton(scenId, bIdx) {
+    function confirmRemoveInlineButton(scenId, bIdx) {
       const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
-      if (scen) {
+      const btnText = scen && scen.inlineButtons[bIdx] ? scen.inlineButtons[bIdx].text : 'кнопку';
+      openConfirmDeleteModal(`Вы действительно хотите удалить Inline-кнопку "${btnText}"?`, () => {
         scen.inlineButtons.splice(bIdx, 1);
+        syncActiveBotWithState();
         renderEditorScenarios();
-      }
+      });
     }
 
     function openScenarioLinkForComponent(scenId, bIdx, type) {
@@ -1139,6 +1306,7 @@
           }
         }
       }
+      syncActiveBotWithState();
       closeActiveModal('modal-link-scenario');
       renderEditorScenarios();
     }
@@ -1147,6 +1315,7 @@
       const scen = appState.activeBot.scenarios.find(s => s.id === scenId);
       if (scen && scen.inlineButtons[bIdx]) {
         scen.inlineButtons[bIdx].linkedScenarios = scen.inlineButtons[bIdx].linkedScenarios.filter(x => x !== cmd);
+        syncActiveBotWithState();
         renderEditorScenarios();
       }
     }
@@ -1172,10 +1341,10 @@
       appState.emulatorMessages.forEach(msg => {
         const bubble = document.createElement('div');
         bubble.className = msg.sender === 'user' 
-          ? 'self-end bg-softbrown text-milk rounded-2xl rounded-tr-none p-3.5 max-w-[85%] text-xs shadow-premium space-y-2 animate-pop' 
-          : 'self-start bg-milk text-graphite rounded-2xl rounded-tl-none p-3.5 max-w-[85%] text-xs shadow-premium space-y-2 animate-pop';
+          ? 'self-end bg-softbrown text-milk rounded-2xl rounded-tr-none p-3.5 max-w-[85%] text-xs shadow-premium space-y-2 animate-pop font-medium' 
+          : 'self-start bg-milk text-graphite rounded-2xl rounded-tl-none p-3.5 max-w-[85%] text-xs shadow-premium space-y-2 animate-pop border border-borderbeige font-medium';
         
-        let htmlContent = `<p class="whitespace-pre-line leading-relaxed font-medium">${escapeHTML(msg.text)}</p>`;
+        let htmlContent = `<p class="whitespace-pre-line leading-relaxed">${escapeHTML(msg.text)}</p>`;
         
         if (msg.inlineButtons && msg.inlineButtons.length > 0) {
           htmlContent += `<div class="grid grid-cols-2 gap-2 pt-2 border-t border-borderbeige/45 mt-2">`;
@@ -1199,7 +1368,7 @@
         kbContainer.innerHTML = '';
         appState.currentEmulatorReplyKeyboard.forEach(btnObj => {
           const btn = document.createElement('button');
-          btn.className = "bg-milk text-graphite py-2.5 rounded-xl text-xs font-semibold border border-borderbeige/85 hover:bg-beige transition-all shadow-sm active:scale-95 animate-pop";
+          btn.className = "bg-milk text-graphite py-2.5 rounded-xl text-xs font-semibold border border-borderbeige hover:bg-beige transition-all shadow-sm active:scale-95 animate-pop";
           btn.onclick = () => sendEmulatorMessageText(btnObj.text, btnObj.actionValue);
           btn.textContent = btnObj.text;
           kbContainer.appendChild(btn);
@@ -1305,7 +1474,7 @@
 
     function showEmulatorSystemToast(text) {
       const toast = document.createElement('div');
-      toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-graphite/95 text-milk text-[11px] px-5 py-3 rounded-2xl shadow-xl z-50 border border-borderbeige/30 transition-all text-center font-medium max-w-[90%] leading-relaxed animate-pop';
+      toast.className = 'fixed top-12 left-1/2 transform -translate-x-1/2 bg-graphite/95 text-milk text-[11px] px-5 py-3 rounded-2xl shadow-xl z-55 border border-borderbeige/30 transition-all text-center font-medium max-w-[90%] leading-relaxed animate-pop';
       toast.innerHTML = text;
       document.body.appendChild(toast);
       setTimeout(() => {
@@ -1365,7 +1534,6 @@ import asyncio
 import logging
 import sys
 from aiogram import Bot, Dispatcher, types, F
-from aiogram import html
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
@@ -1418,10 +1586,9 @@ class BotStates(StatesGroup):
           pyCode += `    await state.set_state(${stateVar})\n`;
         }
 
-        // Страховочный рендеринг алертов/уведомлений, если сценарий с ними был вызван обычной командой / текстовым сообщением
+        // Страховочный вывод алертов, если запуск произошел обычным текстом / командой
         if (scen.hasAlert) {
-          pyCode += `    # [СИМУЛЯЦИЯ АЛЕРТА]: Так как этот шаг запущен текстовым сообщением,\n`;
-          pyCode += `    # Telegram не может показать нативное модальное окно. Симулируем его текстом.\n`;
+          pyCode += `    # [СИМУЛЯЦИЯ АЛЕРТА]: Так как этот шаг запущен текстовым сообщением, симулируем его выделенным текстом.\n`;
           pyCode += `    await message.answer(text="⚠️ <b>[АЛЕРТ]: ${escapePyStr(scen.alertText)}</b>", parse_mode="HTML")\n`;
         }
         if (scen.hasInlineNotif) {
@@ -1567,7 +1734,7 @@ class BotStates(StatesGroup):
         }
       });
 
-      pyCode += `\n# --- ГЛАВНАЯ ТОЧКА ВХОДА И ЗАПУСК ---\nasync def main():\n    print("Бот успешно запущен с профессиональной защитой FSM!")\n    await dp.start_polling(bot)\n\nif __name__ == "__main__":\n    try:\n        asyncio.run(main())\n    except (KeyboardInterrupt, SystemExit):\n        pass\n`;
+      pyCode += `\n# --- ГЛАВНАЯ ТОЧКА ВХОДА И ЗАПУСК ---\nasync def main():\n    print("Бот успешно запущен!")\n    await dp.start_polling(bot)\n\nif __name__ == "__main__":\n    try:\n        asyncio.run(main())\n    except (KeyboardInterrupt, SystemExit):\n        pass\n`;
 
       document.getElementById('code-output-element').textContent = pyCode;
       openModal('modal-codeview');
@@ -1602,76 +1769,6 @@ class BotStates(StatesGroup):
         }[tag] || tag)
       );
     }
-
-    // 1. Инициализируем Supabase (подставь свои данные из настроек Project Settings -> API)
-const SUPABASE_URL = 'https://xhbxfawzxkapfzramfej.supabase.co/';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhoYnhmYXd6eGthcGZ6cmFtZmVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIyNDUxNzUsImV4cCI6MjA5NzgyMTE3NX0.2UB5h-HiCUv48eGsxxYsQEUAcxaSN5WXYQ9PZ46iWEo';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Получаем telegram_id из WebApp.initData
-const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-const telegramId = tgUser ? String(tgUser.id) : 'local_dev_user'; // Для тестов на ПК
-
-// 2. Функция сохранения проекта в базу
-async function saveProjectToSupabase(botName, botConfig) {
-    try {
-        // Проверяем, есть ли уже проект с таким именем у этого юзера
-        const { data: existing, error: searchError } = await supabase
-            .from('projects')
-            .select('id')
-            .eq('user_id', telegramId)
-            .eq('bot_name', botName)
-            .single();
-
-        if (existing) {
-            // Если есть — обновляем конфиг
-            const { error } = await supabase
-                .from('projects')
-                .update({ config: botConfig })
-                .eq('id', existing.id);
-            if (error) throw error;
-            console.log(`Проект ${botName} успешно обновлен!`);
-        } else {
-            // Если нет — создаем новый
-            const { error } = await supabase
-                .from('projects')
-                .insert([{ user_id: telegramId, bot_name: botName, config: botConfig }]);
-            if (error) throw error;
-            console.log(`Новый проект ${botName} успешно создан!`);
-        }
-    } catch (err) {
-        console.error('Ошибка при сохранении в Supabase:', err.message);
-    }
-}
-
-// 3. Функция загрузки всех проектов пользователя при старте
-async function loadProjectsFromSupabase() {
-    try {
-        const { data, error } = await supabase
-            .from('projects')
-            .select('bot_name, config')
-            .eq('user_id', telegramId);
-
-        if (error) throw error;
-
-        if (data && data.length > 0) {
-            // Наполняем наш appState.bots данными из базы
-            appState.bots = {};
-            data.forEach(item => {
-                appState.bots[item.bot_name] = item.config;
-            });
-            console.log('Проекты успешно загружены из Supabase!', appState.bots);
-            // Тут можно вызвать функцию обновления UI твоего конструктора, если нужно
-        }
-    } catch (err) {
-        console.error('Ошибка при загрузке из Supabase:', err.message);
-    }
-}
-
-// Автоматически загружаем проекты при открытии Mini App
-document.addEventListener('DOMContentLoaded', () => {
-    loadProjectsFromSupabase();
-});
   </script>
 
 </body>
