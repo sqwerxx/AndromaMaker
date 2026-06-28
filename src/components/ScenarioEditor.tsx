@@ -275,7 +275,7 @@ export default function ScenarioEditor({
             }`}
           >
             <Sparkles className={`w-3.5 h-3.5 ${shareCopied ? 'text-white' : 'text-amber-gold'}`} />
-            {shareCopied ? 'КОПИЯ СНЯТА!' : 'ПОДЕЛИ ТЕЛЕГРАМ ССЫЛКОЙ'}
+            {shareCopied ? 'Ссылка на проект скопирована!' : 'Поделиться проектом'}
           </button>
 
           <button
@@ -452,7 +452,7 @@ export default function ScenarioEditor({
                       <Sparkles className="w-4 h-4 shrink-0" />
                       <div className="truncate">
                         <div className="text-[11px] font-bold font-sans">Тост-уведомление</div>
-                        <div className="text-[9px] opacity-70">Сплывашка PRO</div>
+                        <div className="text-[9px] opacity-70">Всплывашка</div>
                       </div>
                     </button>
 
@@ -469,7 +469,7 @@ export default function ScenarioEditor({
                       <Link2 className="w-4 h-4 shrink-0" />
                       <div className="truncate">
                         <div className="text-[11px] font-bold font-sans">Инлайн-кнопки</div>
-                        <div className="text-[9px] opacity-70">Под сообщением PRO</div>
+                        <div className="text-[9px] opacity-70">Под сообщением</div>
                       </div>
                     </button>
                   </div>
