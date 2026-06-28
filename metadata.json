@@ -1,0 +1,6 @@
+{
+  "name": "Architect",
+  "description": "Premium Telegram Mini App Constructor with interactive emulator and aiogram 3.x code generator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
